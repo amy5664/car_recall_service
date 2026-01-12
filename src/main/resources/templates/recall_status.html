@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default_layout}">
+<head>
+    <title>차량 리콜 현황</title>
+    <th:block layout:fragment="css">
+    <style>
+        /* 이 페이지에만 적용될 추가적인 스타일 */
+        .container {
+            padding-top: 50px;
+            padding-bottom: 50px;
+        }
+        .search-container {
+            padding: 20px;
+            background: #f8f9fa;
+            margin-top: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .search-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            align-items: center;
+        }
+        .search-form .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .search-form label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+        .search-form input[type="text"],
+        .search-form input[type="date"] {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .search-form .form-actions {
+            grid-column: 1 / -1; /* 버튼을 전체 너비로 확장 */
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .search-form button {
+            padding: 10px 25px;
+            background: #0d47a1;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 1em;
+        }
+        .search-form button.btn-reset {
+            background-color: #6c757d;
+        }
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+            background: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            table-layout: fixed; /* 테이블 레이아웃 고정 */
+        }
+        th, td {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+            vertical-align: middle;
+            word-wrap: break-word; /* 긴 텍스트 자동 줄바꿈 */
+        }
+        th { background-color: #1e88e5; color: white; }
+        tr:hover { background-color: #f1f1f1; }
+        .error-message { color: red; text-align: center; padding: 20px; background-color: #ffebee; border: 1px solid #e57373; border-radius: 8px; margin-top: 20px; }
+        .pagination { text-align: center; margin-top: 20px; }
+        .pagination a, .pagination strong { display: inline-block; padding: 5px 10px; margin: 0 2px; border: 1px solid #ddd; background-color: #fff; text-decoration: none; color: #337ab7; }
+        .pagination strong { background-color: #337ab7; color: white; border-color: #337ab7; }
+
+        /* 컬럼 너비 설정 */
+        .col-maker { width: 10%; }
+        .col-model { width: 15%; }
+        .col-date { width: 10%; }
+        .col-vin { width: 15%; } /* VIN 컬럼 너비 추가 */
+        .col-regNum { width: 10%; } /* 등록번호 컬럼 너비 추가 */
+        .col-reason { width: auto; } /* 리콜 사유는 남은 공간 활용 */
+        .col-detail { width: 8%; } /* 상세 버튼 컬럼 너비 추가 */
+        
+        .csv-download-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 0.95em;
+            margin-top: 10px;
+            border: none;
+            cursor: pointer;
+        }
+        .csv-download-btn:hover {
+            background-color: #218838;
+        }
+        .button-container {
+            text-align: center;
+            margin-top: 10px;
+        }
+        .button-container a + a {
+            margin-left: 10px;
+        }
+        .pdf-download-btn {
+            background-color: #ff7043;
+        }
+        .pdf-download-btn:hover {
+            background-color: #f4511e;
+        }
+
+    </style>
+</head>
+<div layout:fragment="content">
+    <div class="container">
+        <div th:if="${errorMessage != null}" class="error-message">
+            <p th:text="${errorMessage}"></p>
+        </div>
+
+        <div class="search-container">
+            <form th:action="@{/recall-status}" method="get" class="search-form">
+                <div class="form-group">
+                    <label for="maker">제조사</label>
+                    <input type="text" id="maker" name="maker" placeholder="예: 현대자동차" th:value="${pageMaker.cri.maker}">
+                </div>
+                <div class="form-group">
+                    <label for="modelName">모델명</label>
+                    <input type="text" id="modelName" name="modelName" placeholder="예: 소나타" th:value="${pageMaker.cri.modelName}">
+                </div>
+                <div class="form-group">
+                    <label for="startDate">리콜 시작일</label>
+                    <input type="date" id="startDate" name="startDate" th:value="${pageMaker.cri.startDate}">
+                </div>
+                <div class="form-group">
+                    <label for="endDate">리콜 종료일</label>
+                    <input type="date" id="endDate" name="endDate" th:value="${pageMaker.cri.endDate}">
+                </div>
+                <div class="form-actions">
+                    <button type="submit">검색</button>
+                    <button type="button" class="btn-reset" onclick="location.href='/recall-status'">초기화</button>
+                </div>
+            </form>
+        </div>
+        
+        <div class="button-container">
+            <a th:href="@{/recall/download/csv}" class="csv-download-btn">📥 리콜 내역 CSV 다운로드</a>
+            <a th:href="@{/recall/download/pdf}" class="csv-download-btn pdf-download-btn">📄 리콜 내역 PDF 다운로드</a>
+        </div>
+
+        <div th:if="${not #lists.isEmpty(recallList)}">
+            <table id="recallTable">
+                <thead>
+                    <tr>
+                        <th class="col-maker">제조사</th>
+                        <th class="col-model">차종</th>
+                        <th class="col-date">리콜 날짜</th>
+                        <th class="col-vin">VIN</th>
+                        <th class="col-regNum">등록번호</th>
+                        <th class="col-reason">리콜 사유</th>
+                        <th class="col-detail">상세</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="recall : ${recallList}">
+                        <td th:text="${recall.maker}"></td>
+                        <td><a th:href="@{/recall/detail/{id}(id=${recall.id})}" th:text="${recall.modelName}"></a></td>
+                        <td th:text="${recall.recallDate}"></td>
+                        <td th:text="${recall.vin}"></td>
+                        <td th:text="${recall.registrationNumber}"></td>
+                        <td th:text="${recall.recallReason}"></td>
+                        <td><a th:href="@{/recall/detail/{id}(id=${recall.id})}">보기</a></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Pagination -->
+            <div class="pagination">
+                <a th:if="${pageMaker.prev}" th:href="@{/recall-status(pageNum=${pageMaker.startPage - 1}, maker=${pageMaker.cri.maker}, modelName=${pageMaker.cri.modelName}, startDate=${pageMaker.cri.startDate}, endDate=${pageMaker.cri.endDate})}">&laquo;</a>
+                <th:block th:each="num : ${#numbers.sequence(pageMaker.startPage, pageMaker.endPage)}">
+                    <strong th:if="${pageMaker.cri.pageNum == num}" th:text="${num}"></strong>
+                    <a th:unless="${pageMaker.cri.pageNum == num}" th:href="@{/recall-status(pageNum=${num}, maker=${pageMaker.cri.maker}, modelName=${pageMaker.cri.modelName}, startDate=${pageMaker.cri.startDate}, endDate=${pageMaker.cri.endDate})}" th:text="${num}"></a>
+                </th:block>
+                <a th:if="${pageMaker.next}" th:href="@{/recall-status(pageNum=${pageMaker.endPage + 1}, maker=${pageMaker.cri.maker}, modelName=${pageMaker.cri.modelName}, startDate=${pageMaker.cri.startDate}, endDate=${pageMaker.cri.endDate})}">&raquo;</a>
+            </div>
+        </div>
+        <div th:if="${recallList.isEmpty() and errorMessage == null}">
+            <p style="text-align:center; padding-top: 20px;">표시할 리콜 데이터가 없습니다.</p>
+        </div>
+    </div>
+</div>
+</html>

@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default_layout}">
+<head>
+<title>신청인 정보</title>
+<th:block layout:fragment="css">
+<style>
+	html, body {
+	    height: 100%;
+	    margin: 0;
+	    padding: 0;
+	    font-family: "맑은 고딕", sans-serif;
+	    background-color: #f7f9fb;
+	    display: flex;
+	    flex-direction: column;
+	}
+
+	/* 메인 컨텐츠 래퍼 */
+	#content-wrap {
+	    flex: 1; /* footer 밀어내기 */
+	    display: flex;
+	    justify-content: center;
+	    align-items: center;
+	    padding: 40px 0;
+	}
+
+	.container {
+	    width: 800px;
+	    background: #fff;
+	    border: 1px solid #d9d9d9;
+	    border-radius: 6px;
+	    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+	    padding: 30px;
+	}
+
+	h2 {
+	    color: #0066cc;
+	    font-size: 20px;
+	    border-left: 5px solid #0066cc;
+	    padding-left: 10px;
+	    margin-bottom: 25px;
+	}
+
+	table {
+	    width: 100%;
+	    border-collapse: collapse;
+	    margin-bottom: 20px;
+	}
+
+	th, td {
+	    border: 1px solid #ddd;
+	    padding: 12px 15px;
+	    text-align: left;
+	    font-size: 14px;
+	}
+
+	th {
+	    width: 20%;
+	    background-color: #f2f5f8;
+	    font-weight: bold;
+	    color: #333;
+	}
+
+	td {
+	    background-color: #fff;
+	    color: #555;
+	}
+
+	.answer-box, .question-box {
+	    background: #f9f9f9;
+	    border: 1px solid #ddd;
+	    padding: 20px;
+	    line-height: 1.6;
+	    font-size: 14px;
+	    color: #444;
+	    border-radius: 5px;
+        white-space: pre-wrap;
+	}
+
+	.btn-box {
+	    text-align: center;
+	    margin-top: 25px;
+	}
+
+	.btn {
+	    display: inline-block;
+	    background-color: #0066cc;
+	    color: #fff;
+	    padding: 10px 25px;
+	    border-radius: 4px;
+	    text-decoration: none;
+	    margin: 0 5px;
+	    transition: 0.2s;
+	}
+
+	.btn:hover {
+	    background-color: #004c99;
+	}
+
+	.btn.gray {
+	    background-color: #666;
+	}
+
+	.btn.gray:hover {
+	    background-color: #444;
+	}
+
+    .uploadResult ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    .uploadResult li {
+        display: flex;
+        align-items: center;
+        margin-bottom: 8px;
+    }
+    .uploadResult li a {
+        color: #0066cc;
+        text-decoration: none;
+    }
+    .uploadResult li a:hover {
+        text-decoration: underline;
+    }
+    .uploadResult li img {
+        width: 100px; /* 썸네일 크기 조정 */
+        height: 100px; /* 썸네일 크기 조정 */
+        object-fit: cover; /* 이미지 비율 유지하며 채우기 */
+        margin-right: 8px;
+        border: 1px solid #eee;
+        border-radius: 4px;
+        cursor: pointer; /* 클릭 가능 표시 */
+    }
+
+    /* 이미지 확대 모달 스타일 */
+    .bigPicture {
+        position: fixed;
+        display: none; /* 초기에는 숨김 */
+        justify-content: center;
+        align-items: center;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background-color: rgba(0,0,0,0.8);
+        z-index: 10000; /* 다른 요소 위에 표시 */
+        cursor: pointer;
+    }
+    .bigPic img {
+        max-width: 90%;
+        max-height: 90%;
+        border-radius: 8px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    }
+</style>
+</th:block>
+</head>
+<div layout:fragment="content">
+	<div id="content-wrap">
+		<div class="container" th:if="${content_view != null}" th:object="${content_view}">
+		    <h2>신청인 정보</h2>
+		    <table>
+		        <tr>
+		            <th>신청인</th>
+		            <td th:text="*{reporter_name}"></td>
+		        </tr>
+		        <tr>
+		            <th>제목</th>
+		            <td th:text="*{title}"></td>
+		        </tr>
+		        <tr>
+		            <th>상담구분</th>
+		            <td>
+                        <span th:if="*{complain_type == '1'}">제작결함</span>
+                        <span th:if="*{complain_type == '2'}">기타</span>
+                    </td>
+		        </tr>
+		        <tr>
+		            <th>내용</th>
+					<td>
+						<div class="question-box">
+			            	<p th:text="*{content}"></p>
+						</div>
+					</td>	
+		        </tr>
+                <tr th:if="${not #lists.isEmpty(content_view.attachList)}">
+                    <th>첨부파일</th>
+                    <td>
+                        <div class="uploadResult">
+                            <ul>
+                                <li th:each="file : ${content_view.attachList}">
+                                    <a th:href="@{/download(uuid=${file.uuid}, type='complain')}">
+                                        <img th:if="${file.image}"
+                                             th:src="@{/display(uuid=${file.uuid}, type='complain')}"
+                                             th:data-original-uuid="${file.uuid}"
+                                             th:data-original-type="complain"
+                                             alt="thumbnail">
+                                        <img th:unless="${file.image}" th:src="@{/img/attach.png}" alt="attach_icon">
+                                        <span th:text="${file.fileName}"></span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+		        <tr>
+		            <th>문의날짜</th>
+		            <td th:text="${#dates.format(content_view.complainDate, 'yyyy-MM-dd HH:mm')}"></td>
+		        </tr>
+		        <tr>
+		            <th>답변내용</th>
+		            <td>
+		                <div class="answer-box">
+		                    <p th:text="*{answer} ?: '아직 등록된 답변이 없습니다.'"></p>
+		                </div>
+		            </td>
+		        </tr>
+		    </table>
+
+		    <div class="btn-box">
+		        <a th:href="@{/complain_content_modify(report_id=*{report_id})}" class="btn">수정</a>
+		        <a th:href="@{/complain_list}" class="btn gray">목록</a>
+		    </div>
+		</div>
+	</div>
+
+    <!-- 이미지 확대 모달 -->
+    <div class="bigPicture">
+        <div class="bigPic"></div>
+    </div>
+</div>
+
+<th:block layout:fragment="script">
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const uploadResult = document.querySelector('.uploadResult ul');
+            const bigPicture = document.querySelector('.bigPicture');
+            const bigPic = document.querySelector('.bigPic');
+
+            if (uploadResult) {
+                uploadResult.addEventListener('click', function(e) {
+                    const targetImg = e.target.closest('img');
+                    if (targetImg && targetImg.dataset.originalUuid) { // 이미지 썸네일 클릭 시
+                        e.preventDefault(); // 기본 링크 동작 방지
+                        const uuid = targetImg.dataset.originalUuid;
+                        const type = targetImg.dataset.originalType;
+                        const originalImageUrl = `/display?uuid=${uuid}&type=${type}`; // 원본 이미지 URL
+                        showImage(originalImageUrl);
+                    }
+                });
+            }
+
+            function showImage(imageUrl) {
+                bigPic.innerHTML = `<img src="${imageUrl}" alt="확대 이미지">`;
+                bigPicture.style.display = 'flex';
+            }
+
+            bigPicture.addEventListener('click', function() {
+                bigPicture.style.display = 'none';
+                bigPic.innerHTML = ''; // 이미지 제거
+            });
+        });
+    </script>
+</th:block>
+</html>

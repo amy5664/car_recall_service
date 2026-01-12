@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/admin_layout}">
+<head>
+    <title th:text="${board.boardTitle}">보도자료 상세</title>
+    <th:block layout:fragment="css">
+        <style>
+            .container {
+                width: 80%;
+                margin: 40px auto;
+                background: #fff;
+                border-radius: 10px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                padding: 30px 50px;
+            }
+            h2 {
+                text-align: center;
+                margin-bottom: 30px;
+                font-size: 26px;
+                color: #333;
+            }
+            hr {
+                border: none;
+                border-top: 1px solid #ddd;
+                margin: 20px 0;
+            }
+            .info-line {
+                display: flex;
+                justify-content: space-between;
+                color: #666;
+                font-size: 15px;
+            }
+            .uploadResult ul {
+                list-style: none;
+                padding: 0;
+            }
+            .uploadResult li {
+                display: flex;
+                align-items: center;
+                margin: 8px 0;
+                cursor: pointer;
+                color: #007bff;
+                transition: all 0.2s ease;
+            }
+            .uploadResult li:hover {
+                text-decoration: underline;
+            }
+            .uploadResult img {
+                margin-left: 10px;
+                border-radius: 4px;
+            }
+            .content {
+                margin-top: 30px;
+                line-height: 1.7;
+                color: #333;
+                font-size: 16px;
+            }
+            .bigPicture {
+                position: fixed;
+                display: none;
+                justify-content: center;
+                align-items: center;
+                top: 0; left: 0; right: 0; bottom: 0;
+                background-color: rgba(0,0,0,0.8);
+                z-index: 100;
+            }
+            .bigPic img {
+                max-width: 80%;
+                max-height: 80%;
+                border-radius: 10px;
+            }
+            .actions {
+                display: flex;
+                justify-content: center;
+                gap: 15px;
+                margin-top: 40px;
+            }
+            .actions a, .actions button {
+                text-decoration: none;
+                color: white;
+                background-color: #007bff;
+                padding: 10px 20px;
+                border-radius: 6px;
+                transition: background-color 0.2s ease;
+                border: none;
+                cursor: pointer;
+            }
+            .actions a:hover, .actions button:hover {
+                background-color: #0056b3;
+            }
+            .actions .btn-danger { background-color: #dc3545; }
+            .actions .btn-danger:hover { background-color: #c82333; }
+        </style>
+    </th:block>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container" th:if="${board != null}" th:object="${board}">
+        <h2 th:text="*{boardTitle}"></h2>
+        <hr>
+        <div class="info-line">
+            <div><strong>작성자</strong> | <span th:text="*{boardName}"></span></div>
+            <div><strong>조회수</strong> | <span th:text="*{hit}"></span></div>
+        </div>
+        <hr>
+        <div class="info-line">
+            <div><strong>작성일</strong> | <span th:text="${#dates.format(board.boardDate, 'yyyy-MM-dd')}"></span></div>
+        </div>
+        <hr>
+        <div class="uploadResult">
+            <ul></ul>
+            <div class="file-check" style="display:none; color:#666; text-align:left; font-size:15px;">첨부된 파일이 없습니다.</div>
+        </div>
+        <div class="bigPicture">
+            <div class="bigPic"></div>
+        </div>
+        <hr>
+        <div class="content">
+            <p th:utext="*{boardContent}"></p>
+        </div>
+        <div class="actions">
+            <a th:href="@{/admin/press/list(pageNum=${cri.pageNum}, amount=${cri.amount})}">목록으로</a>
+            <a th:href="@{/admin/press/modify(boardNo=*{boardNo}, pageNum=${cri.pageNum}, amount=${cri.amount})}">수정</a>
+            <button type="button" id="deleteBtn" class="btn-danger">삭제</button>
+        </div>
+        <form th:action="@{/admin/press/delete}" method="post" id="deleteForm">
+            <input type="hidden" name="pageNum" th:value="${cri.pageNum}">
+            <input type="hidden" name="amount" th:value="${cri.amount}">
+            <input type="hidden" name="boardNo" th:value="*{boardNo}">
+        </form>
+    </div>
+</div>
+
+<th:block layout:fragment="script">
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function () {
+            const boardNo = /*[[${board.boardNo}]]*/ '';
+            const uploadResult = document.querySelector(".uploadResult ul");
+            const fileCheck = document.querySelector(".file-check");
+
+            fetch(/*[[@{/getFileList}]]*/'' + '?boardNo=' + boardNo)
+                .then(response => response.json())
+                .then(arr => {
+                    if (!arr || arr.length === 0) {
+                        fileCheck.style.display = 'block';
+                        return;
+                    }
+                    let str = "";
+                    arr.forEach(obj => {
+                        const path = encodeURIComponent(obj.uploadPath + "/" + obj.uuid + "_" + obj.fileName);
+                        str += `<li data-path="${obj.uploadPath}" data-uuid="${obj.uuid}" data-filename="${obj.fileName}" data-type="${obj.image}">`;
+                        str += `<span>${obj.fileName}</span>`;
+                        if (obj.image) {
+                            str += `<img src="/*[[@{/display}]]*/'' + '?fileName=${path}" width="80">`;
+                        } else {
+                            str += `<img src="/*[[@{/img/attach.png}]]*/''" width="25">`;
+                        }
+                        str += `</li>`;
+                    });
+                    uploadResult.innerHTML = str;
+                });
+
+            uploadResult.addEventListener('click', function (e) {
+                const targetLi = e.target.closest('li');
+                if (!targetLi) return;
+
+                const path = encodeURIComponent(targetLi.dataset.path + "/" + targetLi.dataset.uuid + "_" + targetLi.dataset.filename);
+                if (targetLi.dataset.type === "true") {
+                    showImage(path);
+                } else {
+                    window.location.href = /*[[@{/download}]]*/'' + '?fileName=' + path;
+                }
+            });
+
+            const bigPicture = document.querySelector('.bigPicture');
+            function showImage(fileCallPath) {
+                bigPicture.style.display = 'flex';
+                bigPicture.querySelector('.bigPic').innerHTML = `<img src="/*[[@{/display}]]*/'' + '?fileName=${fileCallPath}">`;
+            }
+
+            bigPicture.addEventListener('click', function () {
+                this.style.display = 'none';
+            });
+
+            const deleteBtn = document.getElementById('deleteBtn');
+            if(deleteBtn) {
+                deleteBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    if (confirm("삭제하시겠습니까?")) {
+                        document.getElementById('deleteForm').submit();
+                    }
+                });
+            }
+        });
+    </script>
+</th:block>
+</body>
+</html>

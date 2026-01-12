@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/admin_layout}">
+<head>
+    <title>관리자 - 결함 신고 상세</title>
+    <th:block layout:fragment="css">
+        <style>
+        .admin-container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 30px;
+        }
+        .detail-item {
+            margin-bottom: 1rem;
+        }
+        .defect-detail-box {
+            white-space: pre-wrap;
+            padding: 15px;
+            border-radius: 5px;
+            min-height: 150px;
+            border: 1px solid #dee2e6;
+        }
+        .image-gallery {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .image-gallery img {
+            max-width: 150px;
+            height: auto;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        </style>
+    </th:block>
+</head>
+<div layout:fragment="content">
+<div class="container admin-container" th:if="${report != null}" th:object="${report}">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 th:text="|결함 신고 상세 #${report.id}|"></h3>
+        <a th:href="@{/admin/defect_reports}" class="btn btn-outline-secondary">목록으로</a>
+    </div>
+
+    <div class="row detail-item">
+        <div class="col-md-3 detail-label">신고인</div>
+        <div class="col-md-9 font-weight-bold" th:text="*{reporterName}"></div>
+    </div>
+    <div class="row detail-item">
+        <div class="col-md-3 detail-label">연락처</div>
+        <div class="col-md-9 font-weight-bold" th:text="*{contact}"></div>
+    </div>
+    <div class="row detail-item">
+        <div class="col-md-3 detail-label">차량 모델</div>
+        <div class="col-md-9 font-weight-bold" th:text="*{carModel}"></div>
+    </div>
+    <div class="row detail-item">
+        <div class="col-md-3 detail-label">차대번호(VIN)</div>
+        <div class="col-md-9 font-weight-bold" th:text="*{vin}"></div>
+    </div>
+    <div class="row detail-item">
+        <div class="col-md-3 detail-label">신고 시간</div>
+                <div class="col-md-9 font-weight-bold" th:text="${#temporals.format(report.reportDate, 'yyyy-MM-dd HH:mm:ss')}"></div>
+    </div>
+    <div class="detail-item">
+        <div class="detail-label mb-2">상세 결함 내용</div>
+        <div class="defect-detail-box" th:text="*{defectDetails}"></div>
+    </div>
+
+    <div th:if="${not #lists.isEmpty(report.images)}" class="detail-item">
+        <div class="detail-item">
+            <div class="detail-label mb-2">첨부 이미지</div>
+            <div class="image-gallery">
+                <img th:each="image : *{images}" th:src="@{/defect_images/{fileName}(fileName=${image.fileName})}" alt="결함 이미지">
+            </div>
+        </div>
+    </div>
+
+    <hr class="my-4">
+
+    <form th:action="@{/admin/defect_reports/update-status}" method="post">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+        <input type="hidden" name="id" th:value="*{id}">
+        <div class="form-group row">
+            <label for="statusSelect" class="col-md-3 col-form-label">처리 상태</label>
+            <div class="col-md-6">
+                <select class="form-control" id="statusSelect" name="status">
+                    <option value="접수" th:selected="*{status == '접수'}">접수</option>
+                    <option value="처리중" th:selected="*{status == '처리중'}">처리중</option>
+                    <option value="완료" th:selected="*{status == '완료'}">완료</option>
+                    <option value="반려" th:selected="*{status == '반려'}">반려</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary btn-block">상태 변경</button>
+            </div>
+        </div>
+    </form>
+</div>
+</div>
+<th:block layout:fragment="script">
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        document.addEventListener("DOMContentLoaded", function() {
+            const message = /*[[${message}]]*/ null;
+            if (message) {
+                alert(message);
+            }
+        });
+        /*]]>*/
+    </script>
+</th:block>
+</html>

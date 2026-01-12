@@ -1,0 +1,12 @@
+.site-footer{
+  background-color: #263238;
+  color: #ccc;
+  text-align: center;
+  padding: 30px 16px;
+  font-size: .95rem;
+  margin-top: 40px;
+}
+.footer-inner{
+  max-width: 1200px;
+  margin: 0 auto;
+}

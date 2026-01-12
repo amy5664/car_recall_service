@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.boot.dao.FaqDAO">
+    <resultMap id="faqResultMap" type="com.boot.dto.FaqDTO">
+        <result property="faq_id" column="faqNo"/>
+        <result property="category" column="faqCategory"/>
+        <result property="question" column="faqTitle"/>
+        <result property="answer" column="faqContent"/>
+        <result property="created_at" column="faqDate"/>
+    </resultMap>
+
+    <select id="listWithPaging" resultMap="faqResultMap">
+        SELECT faqNo, faqCategory, faqTitle, faqContent, DATE_FORMAT(faqDate, '%Y-%m-%d') as faqDate
+        FROM tbl_faq
+        ORDER BY faqNo DESC
+        LIMIT #{amount} OFFSET ${(pageNum - 1) * amount}
+    </select>
+
+    <select id="getTotalCount" resultType="int">
+        SELECT count(*) FROM tbl_faq
+    </select>
+
+    <select id="getFaq" parameterType="long" resultMap="faqResultMap">
+        SELECT faqNo, faqCategory, faqTitle, faqContent, DATE_FORMAT(faqDate, '%Y-%m-%d %H:%i') as faqDate 
+        FROM tbl_faq 
+        WHERE faqNo = #{faq_id}
+    </select>
+
+    <insert id="write" parameterType="com.boot.dto.FaqDTO" useGeneratedKeys="true" keyProperty="faq_id">
+        INSERT INTO tbl_faq (faqCategory, faqTitle, faqContent, faqDate)
+        VALUES (#{category}, #{question}, #{answer}, NOW())
+    </insert>
+
+    <update id="modify" parameterType="com.boot.dto.FaqDTO">
+        UPDATE tbl_faq 
+        SET faqCategory = #{category}, faqTitle = #{question}, faqContent = #{answer}, faqDate = NOW() 
+        WHERE faqNo = #{faq_id}
+    </update>
+
+    <delete id="delete" parameterType="long">
+        DELETE FROM tbl_faq WHERE faqNo = #{faq_id}
+    </delete>
+
+    <select id="searchByKeyword" parameterType="String" resultMap="faqResultMap">
+        SELECT faqNo, faqCategory, faqTitle, faqContent, DATE_FORMAT(faqDate, '%Y-%m-%d') as faqDate
+        FROM tbl_faq
+        WHERE faqTitle LIKE CONCAT('%', #{keyword}, '%') OR faqContent LIKE CONCAT('%', #{keyword}, '%')
+        ORDER BY faqNo DESC
+    </select>
+</mapper>

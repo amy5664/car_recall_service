@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default_layout}">
+<head><title>메인</title></head>
+<th:block layout:fragment="css">
+    <style>
+        /* ... (기존 테이블 스타일 유지) ... */
+
+        /* ---------------------------------------------------- */
+        /* 🚨 검색 폼 스타일 (세로 탭, 2열 레이아웃) 🚨 */
+        /* ---------------------------------------------------- */
+        .hero .search-form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+            max-width: 750px;
+            margin-left: auto;
+            margin-right: auto;
+            background-color: transparent;
+            padding: 0;
+        }
+
+        /* 폼 태그가 전체 박스 역할을 함 */
+        .hero .search-form form {
+            display: flex; /* 탭 영역과 입력 영역을 가로로 정렬 */
+            width: 100%;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        /* ----------------------- */
+        /* 1. 탭 버튼 영역 (왼쪽 50%) - 세로 정렬 */
+        /* ----------------------- */
+        .hero .search-form .search-tabs {
+            display: flex;
+            flex-direction: column; /* 세로 정렬 */
+            flex: 1; /* 50% 너비 */
+            padding: 0;
+        }
+        .hero .search-form .search-tabs .type-btn {
+            flex: 1; /* 두 버튼이 높이를 동일하게 나눠 가짐 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 30px 15px; /* 세로 패딩 증가 */
+            border: none;
+            background-color: transparent;
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: white; /* 기본 글자색 흰색 */
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+
+        /* 비활성 탭 배경색 (이미지에서 아래쪽 탭이 하늘색) */
+        .hero .search-form .search-tabs .type-btn[data-type="regNum"] {
+            background-color: #5bc0de; /* 등록번호: 밝은 하늘색 */
+        }
+        /* 비활성 탭 배경색 (이미지에서 위쪽 탭이 진한 파란색) */
+        .hero .search-form .search-tabs .type-btn[data-type="vin"] {
+            background-color: #007bff; /* 차대번호: 진한 파란색 */
+        }
+
+        /* 활성 버튼 스타일 */
+        .hero .search-form .search-tabs .type-btn.active {
+            /* 활성 버튼은 항상 진한 파란색 계열 */
+            background-color: #004d99; /* 활성 시 가장 짙은 파랑 (이미지의 왼쪽 탭 색상) */
+            color: white;
+            font-weight: bold;
+        }
+
+        /* 활성/비활성에 따른 경계선 스타일 (선택적) */
+        .hero .search-form .search-tabs .type-btn:hover {
+            opacity: 0.9;
+        }
+
+        /* ----------------------- */
+        /* 2. 입력 및 버튼 영역 (오른쪽 50%) */
+        /* ----------------------- */
+        .hero .search-form .search-input-area {
+            flex: 1; /* 50% 너비 */
+            display: flex;
+            flex-direction: column;
+            justify-content: center; /* 입력창과 버튼을 영역 중앙에 세로로 정렬 */
+            padding: 20px 25px;
+            gap: 15px;
+            background-color: white;
+        }
+
+        /* 검색 입력창 스타일 */
+        .hero .search-form input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            font-size: 1rem;
+            box-shadow: none;
+            transition: border-color 0.2s;
+        }
+        .hero .search-form input[type="text"]:focus {
+            border-color: #007bff;
+            outline: none;
+            box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.25);
+        }
+
+        /* 검색 버튼 스타일 */
+        .hero .search-form button[type="submit"] {
+            width: 100%;
+            padding: 15px 30px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+        .hero .search-form button[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+        /* ---------------------------------------------------- */
+        /* 🚨 검색 결과 UI 개선 🚨 */
+        /* ---------------------------------------------------- */
+        .main-recall-results {
+            margin-top: 40px; /* 검색 폼과의 간격 */
+            margin-bottom: 60px; /* 다음 섹션과의 간격 */
+        }
+
+        .main-recall-results h3 {
+            font-size: 1.8rem;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .main-recall-results .results-summary {
+            text-align: center;
+            font-size: 1.1rem;
+            color: #555;
+            margin-bottom: 25px;
+            padding: 10px 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+            display: inline-block; /* 내용 길이에 맞게 너비 조절 */
+            margin-left: auto;
+            margin-right: auto;
+            display: block; /* 중앙 정렬을 위해 블록 요소로 변경 */
+            max-width: fit-content; /* 내용에 맞게 최대 너비 설정 */
+        }
+
+        /* 반응형 테이블 컨테이너 */
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch; /* iOS 스크롤 부드럽게 */
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e0e0e0; /* 전체 테이블 테두리 */
+        }
+
+        .main-recall-results table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 0; /* table-responsive 내부에 있으므로 상단 마진 제거 */
+            min-width: 800px; /* 작은 화면에서 가로 스크롤 생기도록 최소 너비 설정 */
+        }
+
+        .main-recall-results th,
+        .main-recall-results td {
+            padding: 15px 20px;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+            font-size: 0.95rem;
+            vertical-align: middle;
+        }
+
+        .main-recall-results thead th {
+            background-color: #007bff;
+            color: white;
+            font-weight: bold;
+            position: sticky; /* 스크롤 시 헤더 고정 */
+            top: 0;
+            z-index: 1;
+        }
+
+        .main-recall-results tbody tr:nth-child(even) {
+            background-color: #f8f9fa; /* 줄무늬 효과 */
+        }
+
+        .main-recall-results tbody tr:hover {
+            background-color: #e2f0ff; /* 호버 효과 */
+            cursor: pointer;
+        }
+
+        .main-recall-results td a {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .main-recall-results td a:hover {
+            text-decoration: underline;
+        }
+
+        .main-recall-results .no-results-message {
+            text-align: center;
+            padding: 40px 20px;
+            background-color: #fff3cd; /* 경고색 배경 */
+            border: 1px solid #ffeeba;
+            border-radius: 8px;
+            color: #856404; /* 경고색 텍스트 */
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin-top: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .main-recall-results .no-results-message strong {
+            color: #664d03;
+        }
+
+        /* 모바일 최적화 (선택적: 필요시 추가) */
+        @media (max-width: 768px) {
+            .main-recall-results th,
+            .main-recall-results td {
+                padding: 10px 15px;
+                font-size: 0.85rem;
+            }
+            .main-recall-results .results-summary {
+                font-size: 1rem;
+                padding: 8px 15px;
+            }
+            .main-recall-results .no-results-message {
+                padding: 30px 15px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</th:block>
+
+<div layout:fragment="content">
+
+<div class="hero">
+    <h2>내 차량이 리콜 대상인지 확인하세요</h2>
+    <div class="search-form">
+        <form th:action="@{/}" method="get" id="recallSearchForm">
+
+            <div class="search-tabs">
+                <button type="button" class="type-btn active" data-type="vin">차대번호(VIN)</button>
+                <button type="button" class="type-btn" data-type="regNum">등록번호</button>
+            </div>
+
+            <div class="search-input-area">
+                <input type="text" name="query" id="queryInput" placeholder="차대번호 17자리 (예: KMMDD47F...)" th:value="${query}" required />
+                <button type="submit">🔍 검색</button>
+            </div>
+
+            <input type="hidden" name="searchType" id="hiddenSearchType" th:value="${searchType ?: 'vin'}"/>
+        </form>
+    </div>
+</div>
+
+<section th:if="${query != null and query != ''}" class="main-recall-results container">
+    <section class="main-recall-results container">
+        <h3>'<span th:text="${query}"></span>' 검색 결과</h3>
+        <div th:if="${not #lists.isEmpty(recallList)}">
+            <p class="results-summary">총 <strong th:text="${#lists.size(recallList)}"></strong>건의 리콜 정보가 있습니다.</p>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>제조사</th>
+                            <th>모델명</th>
+                            <!-- <th>생산 기간</th> -->
+                            <th>리콜 날짜</th>
+                            <th>리콜 사유</th>
+                            <th>VIN</th>
+                            <th>등록번호</th>
+                            <th>상세</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="recall : ${recallList}">
+                            <td th:text="${recall.maker}"></td>
+                            <td th:text="${recall.modelName}"></td>
+                            <!-- <td th:text="|${recall.makeStart} ~ ${recall.makeEnd}|"></td> -->
+                            <td th:text="${recall.recallDate}"></td>
+                            <td th:text="${recall.recallReason}"></td>
+                            <td th:text="${recall.vin}"></td>
+                            <td th:text="${recall.registrationNumber}"></td>
+                            <td><a th:href="@{/recall/detail/{id}(id=${recall.id})}">자세히 보기</a></td>
+                        </tbody>
+                    </table>
+                </div>
+        </div>
+        <div th:if="${#lists.isEmpty(recallList)}">
+                <p class="no-results-message">
+                    '<strong><span th:text="${query}"></span></strong>'에 대한 리콜 정보가 없습니다.<br>
+                    입력하신 정보가 정확한지 다시 확인해 주세요.
+                </p>
+        </div>
+    </section>
+</section>
+
+<section class="section-center-hero">
+    <div class="hero-carousel" data-autoplay="true" data-interval="3000" aria-roledescription="carousel">
+        <div class="hero-track">
+            <img src="/img/main1.png" alt="리콜 접수 및 안내 장면">
+            <img src="/img/main2.png" alt="전문 정비사가 점검 중인 모습">
+            <img src="/img/main3.png" alt="서비스 완료 후 안전 주행">
+        </div>
+
+        <button class="hero-nav prev" aria-label="이전 슬라이드">&#10094;</button>
+        <button class="hero-nav next" aria-label="다음 슬라이드">&#10095;</button>
+
+        <div class="showcase-panel">
+            <div class="panel-top">
+                <h3 class="panel-title">자동차 리콜센터</h3>
+                <p class="panel-desc">
+                    정부와 제조사가 함께 운영하는 공식 리콜 서비스입니다.<br>
+                    전국 어디서나 가까운 지정 센터에서 신속하고 투명한 절차로 무료 수리를 제공합니다.
+                </p>
+            </div>
+            <div class="panel-bottom">
+                <div class="chips">
+                    <span class="chip">#정부인증</span>
+                    <span class="chip">#무료수리</span>
+                    <span class="chip">#전국센터</span>
+                    <span class="chip">#실시간조회</span>
+                </div>
+                <div class="panel-cta">
+                    <a class="btn-ghost" th:href="@{/recall-status}">리콜현황 보기</a>
+                    <a class="btn-solid" th:href="@{/report/write}">내 차량 신고하기</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="hero-dots" role="tablist" aria-label="슬라이드 선택">
+            <button class="dot" aria-label="1번 슬라이드"></button>
+            <button class="dot" aria-label="2번 슬라이드"></button>
+            <button class="dot" aria-label="3번 슬라이드"></button>
+        </div>
+    </div>
+</section>
+
+<section class="section-steps">
+    <div class="container">
+        <h3>리콜 절차 및 서비스 안내</h3>
+        <p class="sub">조회부터 수리 완료까지, 3단계로 간단하게 이용하세요.</p>
+
+        <div class="steps-timeline" aria-hidden="true">
+            <span class="dot active"></span><span class="bar"></span>
+            <span class="dot"></span><span class="bar"></span>
+            <span class="dot"></span>
+        </div>
+
+        <div class="card-grid">
+            <article class="card">
+                <div class="icon-badge" aria-hidden="true">🔎</div>
+                <h4>리콜 조회</h4>
+                <p>차량번호/VIN으로 즉시 리콜 여부를 확인하세요.</p>
+                <a class="more" th:href="@{/recall-status}">자세히 보기</a>
+            </article>
+            <article class="card">
+                <div class="icon-badge" aria-hidden="true">📅</div>
+                <h4>서비스센터 찾기</h4>
+                <p>리콜 서비스를 받을 수 있는 서비스센터를 안내해드립니다.</p>
+                <a class="more" th:href="@{/centers/map}">찾아보기</a> <!-- TODO: 링크 수정 필요 -->
+            </article>
+            <article class="card">
+                <div class="icon-badge" aria-hidden="true">🛡️</div>
+                <h4>안전 보장</h4>
+                <p>정부 인증 시스템을 통해 무료 수리를 제공합니다.</p>
+                <a class="more" th:href="@{/faq/list}">FAQ 보기</a>
+            </article>
+        </div>
+    </div>
+</section>
+
+
+<section class="section-hub">
+    <div class="container">
+        <nav class="hub-grid" aria-label="주요 서비스 바로가기">
+            <a class="hub-card" th:href="@{/report/write}">
+                    <span class="hub-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none"><path d="M9 5h6m-3-3v6M6 9h12v10a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V9z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                    </span>
+                <div class="hub-text">
+                    <strong>결함신고</strong>
+                    <span>비회원 제출, 약 5분</span>
+                </div>
+            </a>
+
+            <a class="hub-card" th:href="@{/report/history}">
+                    <span class="hub-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none"><path d="M3 7h6l2 2h10v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z" stroke="currentColor" stroke-width="1.5"/></svg>
+                    </span>
+                <div class="hub-text">
+                    <strong>신고내역</strong>
+                    <span>접수/처리 단계 조회</span>
+                </div>
+            </a>
+
+            <a class="hub-card" th:href="@{/recall-status}">
+                    <span class="hub-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none"><path d="M4 19V5m16 14H4m3-4v4m5-8v8m5-6v6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                    </span>
+                <div class="hub-text">
+                    <strong>리콜현황</strong>
+                    <span>제조사/모델/월별 통계</span>
+                </div>
+            </a>
+
+            <a class="hub-card" th:href="@{/notice/list}">
+                    <span class="hub-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none"><path d="M3 11l14-6v14L3 13v-2zM9 13v5a3 3 0 0 0 3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </span>
+                <div class="hub-text">
+                    <strong>공지/FAQ</strong>
+                    <span>이용 안내/점검 공지</span>
+                </div>
+            </a>
+        </nav>
+    </div>
+</section>
+
+
+<section class="section-news">
+    <div class="container">
+        <div class="news-head">
+            <h3>최근 소식</h3>
+            <a class="news-more" th:href="@{/notice/list}">전체 보기</a>
+        </div>
+        <ul id="newsList" class="news-list" aria-live="polite">
+            <li class="news-item" th:each="notice : ${noticeList}">
+                <span class="tag notice">공지</span>
+                <a th:href="@{/notice/{id}(id=${notice.notice_id})}" th:text="${notice.title}" ></a>
+                <time th:datetime="${notice.created_at}" th:text="${#strings.substring(notice.created_at, 0, 10)}"></time>
+            </li>
+            <li class="news-item" th:each="press : ${pressList}">
+                <span class="tag press">보도자료</span>
+                <a th:href="@{/board/get(boardNo=${press.boardNo})}" th:text="${press.boardTitle}"></a>
+                <time th:datetime="${press.boardDate}" th:text="${#dates.format(press.boardDate, 'yyyy-MM-dd')}"></time>
+            </li>
+            <li class="news-item no-items" th:if="${#lists.isEmpty(noticeList) and #lists.isEmpty(pressList)}">
+                <li class="news-item no-items">
+                    최신 소식이 없습니다.
+                </li>
+        </ul>
+    </div>
+</section>
+
+<section class="trust-strip" aria-label="신뢰 및 운영 안내">
+    <div class="container strip-grid">
+        <div class="strip-item">
+            <span class="strip-dot" aria-hidden="true"></span>
+            <div>
+                <strong>공공 데이터 연계</strong><span>최신 현황 자동 반영</span>
+            </div>
+        </div>
+        <div class="strip-item">
+            <span class="strip-dot" aria-hidden="true"></span>
+            <div>
+                <strong>개인정보 보호</strong><span>암호화 저장·접근 통제</span>
+            </div>
+        </div>
+        <div class="strip-item">
+            <span class="strip-dot" aria-hidden="true"></span>
+            <div>
+                <strong>고객센터</strong><span>평일 09:00–18:00</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+</div>
+
+<th:block layout:fragment="script">
+    <script th:src="@{/js/main.js}"></script>
+    <script type="text/javascript" src="/js/chat.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const typeButtons = document.querySelectorAll('.search-tabs .type-btn');
+        const queryInput = document.getElementById('queryInput');
+        const hiddenSearchType = document.getElementById('hiddenSearchType');
+
+        // 플레이스홀더 텍스트 정의
+        const placeholders = {
+            vin: '차대번호 17자리 (예: KMMDD47F...)',
+            regNum: '자동차 등록번호 (예: 12가3456)'
+        };
+
+        // 초기 활성화 버튼 설정 및 플레이스홀더 업데이트
+        function initializeSearchType() {
+            // URL 파라미터가 없으면 'vin'으로 시작
+            let initialType = hiddenSearchType.value || 'vin';
+            let found = false;
+
+            // 데이터 타입에 따라 플레이스홀더 설정
+            typeButtons.forEach(button => {
+                if (button.dataset.type === initialType) {
+                    button.classList.add('active');
+                    queryInput.placeholder = placeholders[initialType];
+                    found = true;
+                } else {
+                    button.classList.remove('active');
+                }
+            });
+
+            // 초기값이 없을 경우 'vin'으로 설정
+            if (!found) {
+                initialType = 'vin';
+                document.querySelector(`.search-tabs .type-btn[data-type="${initialType}"]`).classList.add('active');
+                queryInput.placeholder = placeholders[initialType];
+                hiddenSearchType.value = initialType;
+            }
+        }
+
+        // 버튼 클릭 이벤트 리스너
+        typeButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                typeButtons.forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+                const selectedType = this.dataset.type;
+                queryInput.placeholder = placeholders[selectedType];
+                hiddenSearchType.value = selectedType; // hidden input 값 업데이트
+            });
+        });
+
+        // 페이지 로드 시 초기화
+        initializeSearchType();
+    });
+</script>
+</th:block>
+</html>

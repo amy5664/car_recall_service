@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/admin_layout}">
+<head>
+    <title>FAQ 관리</title>
+    <th:block layout:fragment="css">
+        <style>
+            .admin-container {
+                max-width: 1200px;
+                margin: 20px auto;
+                padding: 30px;
+            }
+            .table-hover tbody tr:hover { cursor: pointer; }
+            .pagination { justify-content: center; }
+        </style>
+    </th:block>
+</head>
+<div layout:fragment="content">
+    <div class="container admin-container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3>FAQ 관리</h3>
+            <a th:href="@{/admin/faq/write}" class="btn btn-primary">새 FAQ 작성</a>
+        </div>
+
+        <table class="table table-hover text-center">
+            <thead class="thead-light">
+            <tr>
+                <th style="width: 10%;">번호</th>
+                <th style="width: 20%;">카테고리</th>
+                <th style="width: 55%;">질문</th>
+                <th style="width: 15%;">작성일</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:if="${list.isEmpty()}">
+                <td colspan="4">등록된 FAQ가 없습니다.</td>
+            </tr>
+            <tr th:each="item : ${list}" th:data-href="@{/admin/faq/detail(faq_id=${item.faq_id}, pageNum=${pageMaker.cri.pageNum}, amount=${pageMaker.cri.amount})}">
+                <td th:text="${item.faq_id}"></td>
+                <td><span class="badge badge-info" th:text="${item.category}"></span></td>
+                <td class="text-left" th:text="${item.question}"></td>
+                <td th:text="${item.created_at}"></td>
+            </tr>
+            </tbody>
+        </table>
+
+        <!-- Pagination -->
+        <nav>
+            <ul class="pagination">
+                <li class="page-item" th:if="${pageMaker.prev}">
+                    <a class="page-link" th:href="@{/admin/faq/list(pageNum=${pageMaker.startPage - 1}, amount=${pageMaker.cri.amount})}">이전</a>
+                </li>
+
+                <li class="page-item" th:each="num : ${#numbers.sequence(pageMaker.startPage, pageMaker.endPage)}" th:classappend="${pageMaker.cri.pageNum == num} ? 'active'">
+                    <a class="page-link" th:href="@{/admin/faq/list(pageNum=${num}, amount=${pageMaker.cri.amount})}" th:text="${num}"></a>
+                </li>
+
+                <li class="page-item" th:if="${pageMaker.next}">
+                    <a class="page-link" th:href="@{/admin/faq/list(pageNum=${pageMaker.endPage + 1}, amount=${pageMaker.cri.amount})}">다음</a>
+                </li>
+            </ul>
+        </nav>
+        <!-- /Pagination -->
+    </div>
+</div>
+<th:block layout:fragment="script">
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const rows = document.querySelectorAll("tr[data-href]");
+            rows.forEach(row => {
+                row.addEventListener("click", () => {
+                    window.location.href = row.dataset.href;
+                });
+            });
+        });
+    </script>
+</th:block>
+</html>

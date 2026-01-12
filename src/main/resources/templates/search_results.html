@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default_layout}">
+<head>
+    <title>통합 검색 결과</title>
+    <th:block layout:fragment="css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+        <style>
+            .search-results-container {
+                max-width: 900px;
+                margin: 40px auto;
+                padding: 30px;
+                background-color: #fff;
+                border-radius: 8px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            }
+            .search-query {
+                font-size: 1.8rem;
+                font-weight: bold;
+                color: #1a237e;
+                margin-bottom: 30px;
+                text-align: center;
+                border-bottom: 2px solid #e0e0e0;
+                padding-bottom: 20px;
+            }
+            .search-query small {
+                font-size: 1rem;
+                color: #555;
+                font-weight: normal;
+            }
+            .category-filters {
+                text-align: center;
+                margin-bottom: 30px;
+                padding-bottom: 20px;
+                border-bottom: 1px solid #e0e0e0;
+            }
+            .category-filters .btn {
+                background-color: #e0e0e0;
+                color: #333;
+                border: none;
+                padding: 8px 15px;
+                margin: 0 5px;
+                border-radius: 20px;
+                cursor: pointer;
+                transition: background-color 0.2s, color 0.2s;
+            }
+            .category-filters .btn:hover {
+                background-color: #c0c0c0;
+            }
+            .category-filters .btn.active {
+                background-color: #3949ab;
+                color: white;
+            }
+            .results-section {
+                margin-bottom: 40px;
+            }
+            .results-section h2 {
+                font-size: 1.6rem;
+                color: #333;
+                margin-bottom: 20px;
+                padding-bottom: 10px;
+                border-bottom: 2px solid #3949ab;
+            }
+            .results-section h2 .fa-solid {
+                margin-right: 10px;
+                color: #3949ab;
+            }
+            .result-list {
+                list-style: none;
+                padding: 0;
+            }
+            .result-item {
+                background-color: #f8f9fa;
+                border: 1px solid #e0e0e0;
+                border-radius: 8px;
+                padding: 20px;
+                margin-bottom: 15px;
+                transition: box-shadow 0.2s ease, transform 0.2s ease;
+            }
+            .result-item:hover {
+                box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+                transform: translateY(-3px);
+            }
+            .result-item a {
+                text-decoration: none;
+                color: #1a237e;
+                font-size: 1.2rem;
+                font-weight: 600;
+            }
+            .result-item a:hover {
+                text-decoration: underline;
+            }
+            .result-item .meta {
+                font-size: 0.9rem;
+                color: #666;
+                margin-top: 8px;
+            }
+            .no-results {
+                text-align: center;
+                color: #777;
+                padding: 60px 20px;
+                background-color: #f8f9fa;
+                border: 1px dashed #ccc;
+                border-radius: 8px;
+                font-size: 1.1rem;
+            }
+        </style>
+    </th:block>
+</head>
+<div layout:fragment="content">
+    <main class="container">
+        <div class="search-results-container">
+            <h1 class="search-query">
+                '<span th:text="${results.query}"></span>'
+                <small>에 대한 통합 검색 결과입니다.</small>
+            </h1>
+
+            <div class="category-filters">
+                <button class="btn" data-category="all" th:classappend="${selectedCategory == 'all' || selectedCategory == null} ? 'active'">전체</button>
+                <button class="btn" data-category="recall" th:classappend="${selectedCategory == 'recall'} ? 'active'">리콜 정보</button>
+                <button class="btn" data-category="notice" th:classappend="${selectedCategory == 'notice'} ? 'active'">공지사항</button>
+                <button class="btn" data-category="press" th:classappend="${selectedCategory == 'press'} ? 'active'">보도자료</button>
+                <button class="btn" data-category="faq" th:classappend="${selectedCategory == 'faq'} ? 'active'">FAQ</button>
+            </div>
+
+            <div th:if="${results.empty}" class="no-results">
+                <p>모든 카테고리에서 검색 결과가 없습니다.</p>
+            </div>
+
+            <!-- 리콜 정보 결과 -->
+            <section th:if="${(selectedCategory == 'all' || selectedCategory == 'recall') and not #lists.isEmpty(results.recalls)}" class="results-section">
+                <h2><i class="fa-solid fa-car-crash"></i>리콜 정보 (<span th:text="${#lists.size(results.recalls)}"></span>건)</h2>
+                <ul class="result-list">
+                    <li th:each="item : ${results.recalls}" class="result-item">
+                        <a th:href="@{/recall-status(keyword=${item.modelName})}" th:text="|${item.maker} ${item.modelName}|"></a>
+                        <div class="meta">
+                            <span><strong>리콜 사유:</strong> </span><span th:text="${item.recallReason}"></span><br>
+                            <span><strong>리콜 시작일:</strong> </span><span th:text="${item.recallDate}"></span>
+                        </div>
+                    </li>
+                </ul>
+            </section>
+
+            <!-- 공지사항 결과 -->
+            <section th:if="${(selectedCategory == 'all' || selectedCategory == 'notice') and not #lists.isEmpty(results.notices)}" class="results-section">
+                <h2><i class="fa-solid fa-bullhorn"></i>공지사항 (<span th:text="${#lists.size(results.notices)}"></span>건)</h2>
+                <ul class="result-list">
+                    <li th:each="item : ${results.notices}" class="result-item">
+                        <a th:href="@{/notice/{id}(id=${item.notice_id})}" th:text="${item.title}"></a>
+                        <div class="meta">
+                            <span><strong>작성일:</strong> </span><span th:text="${#strings.substring(item.created_at, 0, 10)}"></span>
+                        </div>
+                    </li>
+                </ul>
+            </section>
+
+            <!-- 보도자료 결과 -->
+            <section th:if="${(selectedCategory == 'all' || selectedCategory == 'press') and not #lists.isEmpty(results.pressReleases)}" class="results-section">
+                <h2><i class="fa-solid fa-newspaper"></i>보도자료 (<span th:text="${#lists.size(results.pressReleases)}"></span>건)</h2>
+                <ul class="result-list">
+                    <li th:each="item : ${results.pressReleases}" class="result-item">
+                        <a th:href="@{/board/get(boardNo=${item.boardNo})}" th:text="${item.boardTitle}"></a>
+                        <div class="meta">
+                            <span><strong>작성일:</strong> </span><span th:text="${#dates.format(item.boardDate, 'yyyy-MM-dd')}"></span>
+                        </div>
+                    </li>
+                </ul>
+            </section>
+
+            <!-- FAQ 결과 -->
+            <section th:if="${(selectedCategory == 'all' || selectedCategory == 'faq') and not #lists.isEmpty(results.faqs)}" class="results-section">
+                <h2><i class="fa-solid fa-question-circle"></i>FAQ (<span th:text="${#lists.size(results.faqs)}"></span>건)</h2>
+                <ul class="result-list">
+                    <li th:each="item : ${results.faqs}" class="result-item">
+                        <a th:href="@{/faq/detail(faq_id=${item.faq_id})}" th:text="${item.question}"></a>
+                    </li>
+                </ul>
+            </section>
+        </div>
+    </main>
+</div>
+<th:block layout:fragment="script">
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            const categoryButtons = document.querySelectorAll('.category-filters .btn');
+            const currentQuery = /*[[${results.query}]]*/ '';
+            const currentCategory = /*[[${selectedCategory}]]*/ 'all';
+
+            categoryButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const category = this.dataset.category;
+                    let url = '/search?query=' + encodeURIComponent(currentQuery);
+                    if (category !== 'all') {
+                        url += '&category=' + encodeURIComponent(category);
+                    }
+                    window.location.href = url;
+                });
+            });
+        });
+    </script>
+</th:block>
+</html>

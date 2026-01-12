@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default_layout}">
+<head>
+    <title>리콜 상세 정보</title>
+    <th:block layout:fragment="css">
+    <style>
+        .recall-detail-container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 30px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+        .recall-detail-container h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2rem;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 15px;
+        }
+        .detail-item {
+            display: flex;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px dashed #eee;
+        }
+        .detail-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        .detail-label {
+            font-weight: bold;
+            color: #555;
+            width: 120px;
+            flex-shrink: 0;
+        }
+        .detail-content {
+            color: #333;
+            flex-grow: 1;
+        }
+        .detail-content.reason {
+            white-space: pre-wrap; /* 줄바꿈 유지 */
+        }
+        .back-button-container {
+            text-align: center;
+            margin-top: 40px;
+        }
+        .back-button {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 1rem;
+            transition: background-color 0.2s;
+        }
+        .back-button:hover {
+            background-color: #5a6268;
+        }
+    </style>
+    </th:block>
+</head>
+<div layout:fragment="content">
+    <main class="container">
+        <div class="recall-detail-container">
+            <h1>리콜 상세 정보</h1>
+
+            <div th:if="${recall == null}">
+                <p class="no-results" style="text-align: center;">해당 리콜 정보를 찾을 수 없습니다.</p>
+            </div>
+            <div th:if="${recall != null}" th:object="${recall}">
+                <div class="detail-item">
+                    <span class="detail-label">리콜 ID:</span>
+                    <span class="detail-content" th:text="*{id}"></span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">제조사:</span>
+                    <span class="detail-content" th:text="*{maker}"></span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">모델명:</span>
+                    <span class="detail-content" th:text="*{modelName}"></span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">생산 기간:</span>
+                    <span class="detail-content" th:text="|*{makeStart} ~ *{makeEnd}|"></span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">리콜 날짜:</span>
+                    <span class="detail-content" th:text="*{recallDate}"></span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">VIN:</span>
+                    <span class="detail-content" th:text="*{vin}"></span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">등록번호:</span>
+                    <span class="detail-content" th:text="*{registrationNumber}"></span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">리콜 사유:</span>
+                    <span class="detail-content reason" th:text="*{recallReason}"></span>
+                </div>
+            </div>
+
+            <div class="back-button-container">
+                <a th:href="@{/recall-status}" class="back-button">목록으로 돌아가기</a>
+            </div>
+        </div>
+    </main>
+
+</div>
+</html>

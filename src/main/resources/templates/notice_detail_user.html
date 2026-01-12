@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default_layout}">
+<head>
+    <title th:text="|공지사항 - ${notice.title}|">공지사항 상세</title>
+    <th:block layout:fragment="css">
+        <link rel="stylesheet" th:href="@{/css/notice_user.css}" />
+    </th:block>
+</head>
+<div layout:fragment="content">
+<main class="nu">
+  <section class="nu-wrap">
+    <nav class="nu-breadcrumb" aria-label="경로">
+      <a th:href="@{/}" class="nu-crumb">홈</a>
+      <span class="nu-crumb-sep">/</span>
+      <a th:href="@{/notice/list}" class="nu-crumb">공지사항</a>
+    </nav>
+
+    <article class="nu-card" th:if="${notice != null}" th:object="${notice}">
+      <header class="nu-card-head">
+        <div class="nu-card-top">
+          <h1 class="nu-card-title">
+            <span class="nu-chip nu-chip--danger" th:if="*{is_urgent == 'Y'}">긴급</span>
+            <span th:text="*{title}"></span>
+          </h1>
+        </div>
+        <ul class="nu-meta">
+          <li><strong>작성일</strong> <span th:text="${#strings.substring(notice.created_at, 0, 10)}"></span></li>
+          <li><strong>조회수</strong> <span th:text="*{views}"></span></li>
+        </ul>
+      </header>
+
+      <div class="nu-content" th:utext="*{content}">
+        <!-- 공지 내용이 여기에 렌더링됩니다. -->
+      </div>
+
+      <footer class="nu-card-foot">
+        <a th:href="@{/notice/list}" class="nu-btn">목록으로</a>
+      </footer>
+    </article>
+  </section>
+</main>
+</div>
+</html>

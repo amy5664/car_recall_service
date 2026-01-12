@@ -1,0 +1,137 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.boot.dao.DefectReportDAO">
+
+    <insert id="insertReport" parameterType="com.boot.dto.DefectReportDTO" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO DEFECT_REPORT (
+            USERNAME, REPORTER_NAME, CONTACT, CAR_MODEL, VIN, DEFECT_DETAILS, REPORT_DATE, PASSWORD, STATUS
+        ) VALUES (
+            #{username},
+            #{reporterName},
+            #{contact},
+            #{carModel},
+            #{vin},
+            #{defectDetails},
+            CURRENT_TIMESTAMP,
+            #{password},
+            #{status}
+        )
+    </insert>
+
+    <resultMap id="defectReportResultMap" type="com.boot.dto.DefectReportDTO">
+        <result property="id" column="ID"/>
+        <result property="username" column="USERNAME"/>
+        <result property="reporterName" column="REPORTER_NAME"/>
+        <result property="contact" column="CONTACT"/>
+        <result property="carModel" column="CAR_MODEL"/>
+        <result property="vin" column="VIN"/>
+        <result property="defectDetails" column="DEFECT_DETAILS"/>
+        <result property="reportDate" column="REPORT_DATE"/>
+        <result property="password" column="PASSWORD"/>
+        <result property="status" column="STATUS"/>
+    </resultMap>
+
+    <!-- 페이징 및 검색 처리를 위한 selectAll 쿼리 수정 (MySQL용) -->
+    <select id="selectAll" resultMap="defectReportResultMap">
+        SELECT
+            ID, USERNAME, REPORTER_NAME, CONTACT, CAR_MODEL, VIN, DEFECT_DETAILS, REPORT_DATE, PASSWORD, STATUS
+        FROM DEFECT_REPORT
+        <where>
+            <choose>
+                <when test="username == null">
+                    USERNAME IS NULL
+                </when>
+                <when test="username != 'admin'">
+                    USERNAME = #{username}
+                </when>
+                <!-- else (username == 'admin'): no WHERE clause for username, show all -->
+            </choose>
+            <if test="cri.keyword != null and cri.keyword != ''">
+                AND (UPPER(REPORTER_NAME) LIKE CONCAT('%', UPPER(#{cri.keyword}), '%')
+                OR UPPER(CAR_MODEL) LIKE CONCAT('%', UPPER(#{cri.keyword}), '%')
+                OR UPPER(VIN) LIKE CONCAT('%', UPPER(#{cri.keyword}), '%'))
+            </if>
+        </where>
+        ORDER BY ID DESC
+        LIMIT #{cri.amount} OFFSET #{cri.offset}
+    </select>
+
+
+    <!-- 전체 목록 조회 (페이징 없이, CSV 다운로드용) -->
+    <select id="selectAllWithoutPaging" resultMap="defectReportResultMap">
+        SELECT
+            ID, REPORTER_NAME, CONTACT, CAR_MODEL, VIN, DEFECT_DETAILS,
+            DATE_FORMAT(REPORT_DATE, '%Y-%m-%d %H:%i:%s') as REPORT_DATE, PASSWORD
+        FROM DEFECT_REPORT
+        ORDER BY ID DESC
+    </select>
+
+    <!-- 검색 조건에 따른 전체 데이터 수 조회 쿼리 수정 -->
+    <select id="count" resultType="int">
+        SELECT COUNT(*) FROM DEFECT_REPORT
+        <where>
+            <choose>
+                <when test="username == null">
+                    USERNAME IS NULL
+                </when>
+                <when test="username != 'admin'">
+                    USERNAME = #{username}
+                </when>
+                <!-- else (username == 'admin'): no WHERE clause for username, show all -->
+            </choose>
+            <if test="keyword != null and keyword != ''">
+                AND (UPPER(REPORTER_NAME) LIKE CONCAT('%', UPPER(#{keyword}), '%')
+                OR UPPER(CAR_MODEL) LIKE CONCAT('%', UPPER(#{keyword}), '%')
+                OR UPPER(VIN) LIKE CONCAT('%', UPPER(#{keyword}), '%'))
+            </if>
+        </where>
+    </select>
+
+    <!-- ID로 단일 결함 신고 조회 -->
+    <select id="selectById" parameterType="long" resultMap="defectReportResultMap">
+        SELECT
+            ID, USERNAME, REPORTER_NAME, CONTACT, CAR_MODEL, VIN, DEFECT_DETAILS, REPORT_DATE, PASSWORD, STATUS
+        FROM DEFECT_REPORT
+        WHERE ID = #{id}
+    </select>
+
+    <!-- 결함 신고 수정 -->
+    <update id="updateReport" parameterType="com.boot.dto.DefectReportDTO">
+        UPDATE DEFECT_REPORT
+        SET
+            USERNAME = #{username},
+            REPORTER_NAME = #{reporterName},
+            CONTACT = #{contact},
+            CAR_MODEL = #{carModel},
+            VIN = #{vin},
+            DEFECT_DETAILS = #{defectDetails},
+            STATUS = #{status}
+        WHERE ID = #{id}
+    </update>
+
+    <update id="updateStatus">
+        UPDATE DEFECT_REPORT
+        SET STATUS = #{status}
+        WHERE ID = #{id}
+    </update>
+
+    <!-- 결함 신고 삭제 -->
+    <delete id="deleteReport" parameterType="long">
+        DELETE FROM DEFECT_REPORT WHERE ID = #{id}
+    </delete>
+
+    <!-- 비밀번호 조회 -->
+    <select id="selectPasswordById" parameterType="long" resultType="string">
+        SELECT PASSWORD FROM DEFECT_REPORT WHERE ID = #{id}
+    </select>
+
+    <select id="selectAllWithoutPagings" resultMap="defectReportResultMap">
+        SELECT
+            ID, USERNAME, REPORTER_NAME, CONTACT, CAR_MODEL, VIN, DEFECT_DETAILS, REPORT_DATE, PASSWORD, STATUS
+        FROM DEFECT_REPORT
+        ORDER BY ID DESC
+    </select>
+
+</mapper>

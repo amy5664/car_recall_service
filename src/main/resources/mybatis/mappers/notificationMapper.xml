@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boot.dao.NotificationDao">
+
+    <resultMap id="notificationResultMap" type="com.boot.dto.NotificationDto">
+        <id property="id" column="ID"/>
+        <result property="username" column="USERNAME"/>
+        <result property="type" column="TYPE"/>
+        <result property="title" column="TITLE"/>
+        <result property="message" column="MESSAGE"/>
+        <result property="link" column="LINK"/>
+        <result property="isRead" column="IS_READ" typeHandler="com.boot.util.BooleanYNTypeHandler"/>
+        <result property="createdAt" column="CREATED_AT"/>
+    </resultMap>
+
+    <insert id="save" parameterType="com.boot.dto.NotificationDto" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO NOTIFICATION (USERNAME, TYPE, TITLE, MESSAGE, LINK, IS_READ, CREATED_AT)
+        VALUES (#{username}, #{type}, #{title}, #{message}, #{link},
+                #{isRead, typeHandler=com.boot.util.BooleanYNTypeHandler}, #{createdAt})
+    </insert>
+
+    <select id="findByUsername" parameterType="String" resultMap="notificationResultMap">
+        SELECT ID, USERNAME, TYPE, TITLE, MESSAGE, LINK, IS_READ, CREATED_AT
+        FROM NOTIFICATION
+        WHERE USERNAME = #{username}
+        ORDER BY CREATED_AT DESC
+    </select>
+
+    <update id="markAsRead" parameterType="long">
+        UPDATE NOTIFICATION
+        SET IS_READ = 'Y'
+        WHERE ID = #{id}
+    </update>
+
+    <select id="countUnreadNotifications" parameterType="String" resultType="int">
+        SELECT COUNT(*)
+        FROM NOTIFICATION
+        WHERE USERNAME = #{username} AND IS_READ = 'N'
+    </select>
+</mapper>

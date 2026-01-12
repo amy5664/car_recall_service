@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/admin_layout}">
+<head>
+    <title>관리자 - 결함 신고 목록</title>
+    <th:block layout:fragment="css">
+        <style>
+        .admin-container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 30px;
+        }
+        .table-hover tbody tr:hover {
+            cursor: pointer;
+        }
+        .pagination {
+            justify-content: center;
+        }
+        </style>
+    </th:block>
+</head>
+<div layout:fragment="content">
+<div class="container admin-container">
+    <h3>결함 신고 목록</h3>
+    <div class="search-container mb-3">
+        <form th:action="@{/admin/defect_reports}" method="get" class="form-inline justify-content-end">
+            <input type="text" class="form-control mr-2" name="keyword" placeholder="신고인, 모델, VIN 검색" th:value="${pageMaker.cri.keyword}">
+            <button type="submit" class="btn btn-primary">검색</button>
+        </form>
+    </div>
+    <table class="table table-hover mt-3">
+        <thead class="thead-light text-center">
+        <tr>
+            <th>ID</th>
+            <th>신고인</th>
+            <th>차량 모델</th>
+            <th>VIN</th>
+            <th>신고일</th>
+            <th>상태</th>
+        </tr>
+        </thead>
+        <tbody class="text-center">
+        <tr th:if="${list.isEmpty()}">
+            <td colspan="6" class="text-center">등록된 결함 신고가 없습니다.</td>
+        </tr>
+        <tr th:each="report : ${list}" th:onclick="|location.href='@{/admin/defect_reports/{id}(id=${report.id})}'|">
+            <td th:text="${report.id}"></td>
+            <td th:text="${report.reporterName}"></td>
+            <td th:text="${report.carModel}"></td>
+            <td th:text="${report.vin}"></td>
+            <td th:text="${#temporals.format(report.reportDate, 'yyyy-MM-dd')}"></td>
+            <td th:switch="${report.status}">
+                <span th:case="'접수'" class="badge badge-info">접수</span>
+                <span th:case="'처리중'" class="badge badge-warning">처리중</span>
+                <span th:case="'완료'" class="badge badge-success">완료</span>
+                <span th:case="*" class="badge badge-secondary" th:text="${report.status}"></span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <!-- Pagination -->
+    <nav th:if="${pageMaker.total > 0}">
+        <ul class="pagination">
+            <li class="page-item" th:if="${pageMaker.prev}">
+                <a class="page-link" th:href="@{/admin/defect_reports(pageNum=${pageMaker.startPage - 1}, keyword=${pageMaker.cri.keyword})}">이전</a>
+            </li>
+
+            <li class="page-item" th:each="num : ${#numbers.sequence(pageMaker.startPage, pageMaker.endPage)}" th:classappend="${pageMaker.cri.pageNum == num} ? 'active'">
+                <a class="page-link" th:href="@{/admin/defect_reports(pageNum=${num}, keyword=${pageMaker.cri.keyword})}" th:text="${num}"></a>
+            </li>
+
+            <li class="page-item" th:if="${pageMaker.next}">
+                <a class="page-link" th:href="@{/admin/defect_reports(pageNum=${pageMaker.endPage + 1}, keyword=${pageMaker.cri.keyword})}">다음</a>
+            </li>
+        </ul>
+    </nav>
+</div>
+</html>

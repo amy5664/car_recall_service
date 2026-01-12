@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title layout:title-pattern="$CONTENT_TITLE - 관리자 페이지">자동차 리콜 통합센터</title>
+
+    <!-- 1. 공통 CSS 파일 -->
+    <link rel="stylesheet" th:href="@{/css/main.css}" />
+    <link rel="stylesheet" th:href="@{/css/header.css}" />
+    <link rel="stylesheet" th:href="@{/css/footer.css}" />
+    <link rel="stylesheet" th:href="@{https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css}">
+
+    <!-- 2. 각 페이지의 고유한 CSS를 위한 공간 -->
+    <th:block layout:fragment="css"></th:block>
+</head>
+<body>
+    <!-- 관리자용 공통 헤더 -->
+    <div th:replace="~{fragment/adminheader :: adminHeaderFragment}"></div>
+
+    <!-- 3. 각 페이지의 실제 내용이 삽입될 공간 -->
+    <th:block layout:fragment="content"></th:block>
+
+    <!-- 4. 공통 스크립트 -->
+    <script th:src="@{/js/jquery.js}"></script>
+    <script th:src="@{/js/admin-consultation-dashboard.js}"></script>
+    <!-- 5. 각 페이지의 고유한 스크립트를 위한 공간 -->
+    <th:block layout:fragment="script"></th:block>
+</body>
+</html>

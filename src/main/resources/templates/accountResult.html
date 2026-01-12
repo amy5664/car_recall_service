@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default_layout}">
+<head>
+    <title>요청 처리 결과</title>
+    <th:block layout:fragment="css">
+        <link rel="stylesheet" th:href="@{/css/login.css}" />
+    <style>
+        .result-message {
+            font-size: 1.1rem;
+            color: #333;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+    </style>
+    </th:block>
+</head>
+<div layout:fragment="content">
+    <main class="login-container">
+        <div class="login-card">
+            <h1 class="login-title">요청 처리 완료</h1>
+            <p class="result-message" th:text="${message}">요청이 성공적으로 처리되었습니다.</p>
+            <a th:href="@{/login}" class="login-btn" style="text-decoration: none; display: block; margin-top: 1.5rem;">로그인으로 돌아가기</a>
+        </div>
+    </main>
+</div>
+</html>

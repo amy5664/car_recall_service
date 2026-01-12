@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/admin_layout}">
+<head>
+    <title>고객 문의 목록</title>
+    <th:block layout:fragment="css">
+        <style>
+            .admin-container {
+                max-width: 1200px;
+                margin: 20px auto;
+                padding: 30px;
+            }
+            .table-hover tbody tr:hover { cursor: pointer; } /* 행 클릭 가능하도록 커서 변경 */
+            /* .col-action, .detail-btn 관련 CSS 제거 */
+        </style>
+    </th:block>
+</head>
+<div layout:fragment="content">
+    <div class="container admin-container">
+        <h2>고객 문의 목록</h2>
+        <table class="table table-hover mt-3">
+            <thead class="thead-light text-center">
+            <tr>
+                <th>문의번호</th>
+                <th>제목</th>
+                <th>신고인</th>
+                <th>문의유형</th>
+                <th>작성일</th>
+                <th style="width: 10%;">처리상태</th>
+                <!-- 상세보기 버튼 컬럼 제거 -->
+            </tr>
+            </thead>
+            <tbody class="text-center">
+            <tr th:if="${list.isEmpty()}">
+                <td colspan="6">등록된 고객 문의가 없습니다.</td> <!-- colspan 7에서 6으로 변경 -->
+            </tr>
+            <tr th:each="item : ${list}" th:data-href="@{/admin/complain/detail(report_id=${item.report_id})}"> <!-- th:data-href 속성 다시 추가 -->
+                <td th:text="${item.report_id}"></td>
+                <td class="text-left" th:text="${item.title}"></td>
+                <td th:text="${item.reporter_name}"></td>
+                <td th:text="${item.complain_type == '1' ? '제작결함' : '기타'}"></td>
+                <td th:text="${#dates.format(item.complainDate, 'yyyy-MM-dd HH:mm')}"></td>
+                <td>
+                    <span th:if="${#strings.equals(item.status, '답변 완료')}" class="badge badge-success">답변 완료</span>
+                    <span th:unless="${#strings.equals(item.status, '답변 완료')}" class="badge badge-warning">접수</span>
+                </td>
+                <!-- 상세보기 버튼 제거 -->
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<th:block layout:fragment="script">
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const rows = document.querySelectorAll("tr[data-href]");
+            rows.forEach(row => {
+                row.addEventListener("click", () => {
+                    window.location.href = row.dataset.href;
+                });
+            });
+        });
+    </script>
+</th:block>
+</html>

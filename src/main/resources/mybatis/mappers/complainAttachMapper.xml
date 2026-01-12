@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.boot.dao.ComplainAttachDAO">
+
+    <insert id="insert">
+        insert into complain_attach (uuid, uploadPath, fileName, image, report_id)
+        values (#{uuid}, #{uploadPath}, #{fileName}, #{image}, #{report_id})
+    </insert>
+
+    <select id="findByReportId" resultType="com.boot.dto.ComplainAttachDTO">
+        select * from complain_attach where report_id = #{report_id}
+    </select>
+
+    <delete id="deleteAll">
+        delete from complain_attach where report_id = #{report_id}
+    </delete>
+
+    <select id="findByUuid" resultType="com.boot.dto.ComplainAttachDTO">
+        select * from complain_attach where uuid = #{uuid}
+    </select>
+
+    <delete id="delete">
+        delete from complain_attach where uuid = #{uuid}
+    </delete>
+</mapper>

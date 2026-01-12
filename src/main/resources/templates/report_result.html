@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default_layout}">
+<head>
+    <title>신고 접수 결과</title>
+    <th:block layout:fragment="css">
+        <style>
+        body { font-family: sans-serif; text-align: center; margin-top: 50px; }
+        .message { font-size: 1.2em; }
+        .link { margin-top: 20px; }
+        </style>
+    </th:block>
+</head>
+<div layout:fragment="content">
+    <h1>신고 접수 결과</h1>
+    <p class="message" th:text="${message}">신고가 성공적으로 접수되었습니다.</p>
+    <div class="link">
+        <a th:href="@{/}">홈으로 돌아가기</a>
+    </div>
+</div>
+</html>

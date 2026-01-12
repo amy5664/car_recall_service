@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default_layout}">
+<head>
+    <title>신청 내역 게시판</title>
+    <th:block layout:fragment="css">
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: "맑은 고딕", sans-serif;
+            background-color: #f7f9fb;
+        }
+
+        /* 화면 전체 중앙 정렬용 래퍼 */
+        .page-wrapper {
+            min-height: 100vh; /* 화면 높이 100% 채움 */
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding-top: 80px; /* 위 여백 */
+            box-sizing: border-box;
+        }
+
+        .board-container {
+            width: 80%;
+            max-width: 1000px;
+            background: #fff;
+            border: 1px solid #d9d9d9;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+
+        h2 {
+            color: #0066cc;
+            font-size: 22px;
+            border-left: 5px solid #0066cc;
+            padding-left: 10px;
+            margin-bottom: 25px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            border-bottom: 1px solid #e5e5e5;
+            text-align: center;
+            padding: 12px 10px;
+            font-size: 14px;
+            color: #333;
+        }
+
+        th {
+            background-color: #f2f5f8;
+            font-weight: bold;
+        }
+
+        td a {
+            text-decoration: none;
+            color: #0066cc;
+        }
+
+        td a:hover {
+            text-decoration: underline;
+        }
+
+        .btn-box {
+            text-align: right;
+            margin-top: 10px;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: #0066cc;
+            color: #fff;
+            padding: 8px 20px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background-color: #004c99;
+        }
+
+        .no-data {
+            text-align: center;
+            color: #777;
+            padding: 40px 0;
+        }
+        /* 행 클릭 가능하도록 커서 변경 */
+        tbody tr {
+            cursor: pointer;
+        }
+    </style>
+</th:block>
+<div layout:fragment="content">
+    <div class="page-wrapper">
+        <div class="board-container">
+            <h2>신청 내역</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>no.</th>
+                        <th>제목</th>
+                        <th>상담구분</th>
+                        <th>신청인</th>
+                        <th>문의날짜</th>
+                        <th>답변상태</th>
+                        <!-- 상세보기 버튼 컬럼 제거 -->
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr th:if="${list.isEmpty()}">
+                        <td colspan="6" class="no-data">등록된 신청 내역이 없습니다.</td> <!-- colspan 7에서 6으로 변경 -->
+                    </tr>
+                    <tr th:each="dto : ${list}" th:data-href="@{/complain_content_view(report_id=${dto.report_id})}"> <!-- th:data-href 추가 -->
+                        <td th:text="${dto.report_id}"></td>
+                        <td>
+                            <!-- 링크는 행 클릭 이벤트로 대체되므로 제거 -->
+                            <th:block th:if="${dto.is_public == 'N'}">
+                                <span class="lock-icon">🔒</span> 비공개 글입니다.
+                            </th:block>
+                            <th:block th:unless="${dto.is_public == 'N'}">
+                                <span th:text="${dto.title}"></span>
+                            </th:block>
+                        </td>
+                        <td>
+                            <span th:text="${dto.complain_type == '1' ? '제작결함' : '기타'}"></span>
+                        </td>
+                        <td th:text="${dto.reporter_name}"></td>
+                        <td th:text="${#dates.format(dto.complainDate, 'yyyy-MM-dd HH:mm')}"></td>
+                        <td>
+                            <span th:if="${#strings.equals(dto.status, '답변 완료')}" class="badge badge-success">답변 완료</span>
+                            <span th:unless="${#strings.equals(dto.status, '답변 완료')}" class="badge badge-warning">접수</span>
+                        </td>
+                        <!-- 상세보기 버튼 제거 -->
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="btn-box">
+                <a th:href="@{/complain_write_view}" class="btn">글작성</a>
+            </div>
+        </div>
+    </div>
+</div>
+<th:block layout:fragment="script">
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const rows = document.querySelectorAll("tr[data-href]");
+            rows.forEach(row => {
+                row.addEventListener("click", () => {
+                    window.location.href = row.dataset.href;
+                });
+            });
+        });
+    </script>
+</th:block>
+</html>

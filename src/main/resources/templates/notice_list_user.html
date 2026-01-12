@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default_layout}">
+<head>
+    <title>공지사항</title>
+    <th:block layout:fragment="css">
+        <link rel="stylesheet" th:href="@{/css/notice_user.css}" />
+    </th:block>
+</head>
+<div layout:fragment="content">
+<main class="nu">
+  <section class="nu-wrap">
+    <header class="nu-head">
+      <h1 class="nu-title">공지사항</h1>
+      <p class="nu-desc">리콜센터의 중요한 안내를 빠르게 확인하세요.</p>
+    </header>
+
+    <div class="nu-table-wrap">
+      <table class="nu-table">
+        <colgroup>
+          <col style="width:110px"/>
+          <col/>
+          <col style="width:160px"/>
+          <col style="width:110px"/>
+        </colgroup>
+        <thead>
+          <tr>
+            <th scope="col">번호</th>
+            <th scope="col">제목</th>
+            <th scope="col">작성일</th>
+            <th scope="col">조회수</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="nu-empty" th:if="${list.isEmpty()}">
+            <td colspan="4">등록된 공지사항이 없습니다.</td>
+          </tr>
+          <tr class="nu-row" th:each="item : ${list}" th:data-href="@{/notice/{id}(id=${item.notice_id})}">
+            <td class="nu-cell--center" th:text="${item.notice_id}"></td>
+            <td class="nu-cell--left">
+              <span class="nu-chip nu-chip--danger" th:if="${item.is_urgent == 'Y'}" aria-label="필독">필독</span>
+              <a th:href="@{/notice/{id}(id=${item.notice_id})}" class="nu-link" th:text="${item.title}"></a>
+            </td>
+            <td class="nu-cell--center" th:text="${item.created_at}"></td>
+            <td class="nu-cell--center" th:text="${item.views}"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <nav class="nu-paging" aria-label="공지 목록 페이지 이동">
+      <ul>
+        <li th:if="${pageMaker.prev}">
+          <a class="nu-page" th:href="@{/notice/list(pageNum=${pageMaker.startPage - 1})}">이전</a>
+        </li>
+        <li th:each="num : ${#numbers.sequence(pageMaker.startPage, pageMaker.endPage)}">
+            <a class="nu-page"
+               th:classappend="${pageMaker.cri.pageNum == num} ? 'is-active'"
+               th:href="@{/notice/list(pageNum=${num})}"
+               th:text="${num}"></a>
+        </li>
+        <li th:if="${pageMaker.next}">
+          <a class="nu-page" th:href="@{/notice/list(pageNum=${pageMaker.endPage + 1})}">다음</a>
+        </li>
+      </ul>
+    </nav>
+  </section>
+</main>
+</div>
+<th:block layout:fragment="script">
+<script>
+  document.querySelectorAll('.nu-row').forEach(tr => {
+    tr.addEventListener('click', () => {
+      const href = tr.getAttribute('data-href');
+      if (href) { location.href = href; }
+    });
+  });
+</script>
+</th:block>
+</html>

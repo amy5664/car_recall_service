@@ -1,0 +1,279 @@
+/* ===== 헤더 공통 ===== */
+:root{
+  --blue-700:#0d47a1;
+  --blue-600:#1976d2;
+  --blue-500:#1e88e5;
+  --text-on-dark:#ffffff;
+  --surface:#ffffff;
+  --shadow:0 10px 28px rgba(0,0,0,.14);
+}
+
+.site-header{
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: var(--blue-700);
+  color: var(--text-on-dark);
+  box-shadow: 0 2px 8px rgba(0,0,0,.15);
+  overflow: visible;              /* 드롭다운 잘림 방지 */
+}
+.header-inner{
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  overflow: visible;              /* 드롭다운 잘림 방지 */
+}
+
+.brand{
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: var(--text-on-dark);
+  text-decoration: none;
+  letter-spacing: .2px;
+}
+
+/* ===== 검색창 ===== */
+.header-search {
+    flex-grow: 1;
+    max-width: 400px;
+    margin: 0 20px;
+}
+
+.header-search form {
+    display: flex;
+    background-color: #fff;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.header-search input[type="text"] {
+    flex-grow: 1;
+    border: none;
+    padding: 8px 15px;
+    font-size: 0.95rem;
+    background: transparent;
+    color: #333;
+    outline: none;
+}
+
+.header-search button {
+    border: none;
+    background-color: var(--blue-500);
+    color: white;
+    padding: 8px 15px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: background-color 0.2s;
+}
+
+.header-search button:hover {
+    background-color: var(--blue-600);
+}
+
+
+/* ===== 네비게이션(공통) ===== */
+.nav{ display: block; position: relative; }
+.menu{
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0; padding: 0;
+}
+.menu-item{ position: relative; }
+.menu-link,
+.menu > li > a{
+  display: inline-block;
+  padding: 10px 14px;
+  color: var(--text-on-dark);
+  text-decoration: none;
+  font-weight: 500;
+  border-radius: 8px;
+  position: relative;
+  font-family: "Noto Sans KR", sans-serif; /* 폰트 통일 */
+  font-size: 1rem; /* 폰트 크기 명시 */
+}
+.menu-item {
+  white-space: nowrap; /* 메뉴 항목 글자 깨짐 방지 */
+}
+
+/* 로그아웃 form을 a 태그처럼 보이게 */
+form.menu-link {
+  padding: 0; /* 내부 버튼과 여백이 중첩되지 않도록 */
+}
+
+/* 로그아웃 버튼 스타일 초기화 */
+.btn-logout {
+  background: none; border: none; padding: 10px 14px;
+  font: inherit; color: var(--text-on-dark); cursor: pointer;
+}
+.menu-link:hover,
+.menu > li > a:hover{ background: rgba(255,255,255,.12); }
+
+/* 활성 메뉴(페이지 매칭 시 이 클래스 부여) */
+.menu .active{
+  background: rgba(255,255,255,.18);
+  box-shadow: inset 0 -3px 0 0 var(--blue-500);
+}
+
+/* ===== 드롭다운(데스크톱) ===== */
+.submenu{
+  position: absolute;
+  left: 0;
+  top: 100%;                      /* 부모 탭 바로 아래에 붙임: 틈 제거 */
+  min-width: 180px;
+  background: var(--surface);
+  color: #222;
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+  padding: 8px;
+  list-style: none;
+  z-index: 50;
+  /* display 대신 visibility/opacity 전환: hover 끊김 방지 */
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(6px);
+  pointer-events: none;
+  transition: opacity .15s ease, transform .15s ease, visibility 0s linear .15s;
+}
+.submenu a{
+  display: block;
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: #222;
+  text-decoration: none;
+  font-weight: 500;
+  white-space: nowrap;
+  font-family: "Noto Sans KR", sans-serif; /* 폰트 통일 */
+  font-size: 1rem; /* 폰트 크기 명시 */
+}
+.submenu a:hover{ background: #f2f6ff; }
+
+/* hover / focus-within / 스크립트 토글 시 열림 */
+.menu-item.has-sub:hover > .submenu,
+.menu-item.has-sub:focus-within > .submenu,
+.menu-item.has-sub.sub-open > .submenu{
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  pointer-events: auto;
+  transition-delay: 0s;
+}
+
+/* 커서 이동 중 hover 끊김 방지용 투명 ‘브리지’ */
+.menu-item.has-sub::after{
+  content:"";
+  position:absolute;
+  left:0; right:0;
+  top:100%;
+  height:8px;                     /* 메뉴와 서브 사이를 메움 */
+}
+
+/* ===== 모바일 ===== */
+.nav-toggle{
+  display: none;
+  width: 42px; height: 38px;
+  border: none; background: transparent; cursor: pointer;
+}
+.nav-toggle .bar{
+  display: block; width: 100%; height: 3px;
+  background: var(--text-on-dark); margin: 6px 0;
+  transition: .25s ease;
+}
+
+/*  < 920px 에서 모바일 메뉴로 전환 */
+@media (max-width: 920px){
+  .nav-toggle{ display: inline-block; }
+
+  .header-search {
+    display: none; /* 모바일에서는 헤더 검색창 숨김 */
+  }
+
+  .nav{
+    position: fixed;
+    inset: 60px 0 0 0;            /* 헤더 바로 아래 전체 */
+    background: var(--blue-700);
+    transform: translateY(-110%);
+    transition: transform .28s ease;
+    padding: 14px 16px 24px;
+    overflow-y: auto;
+  }
+  .nav.open{ transform: translateY(0); }
+
+  .menu{
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+  }
+
+  /* 모바일에서는 아코디언 */
+  .submenu{
+    position: static;
+    box-shadow: none;
+    border-radius: 10px;
+    background: rgba(255,255,255,.08);
+    color: var(--text-on-dark);
+    margin: 6px 0 0 0;
+    padding: 4px 0;
+    transform: none;
+    opacity: 1; visibility: visible; pointer-events: auto;
+    display: none;                /* 기본 닫힘 */
+    transition: none;
+  }
+  .menu-item.has-sub.sub-open > .submenu{ display: block; }
+  .submenu a{ color: var(--text-on-dark); }
+}
+
+/* 본문이 뒤로 스크롤되지 않도록(모바일 메뉴 열림 시) */
+body.nav-open{ overflow: hidden; }
+
+/* 접근성: 포커스 링 */
+.menu a:focus{ outline: 2px solid #9cc3ff; outline-offset: 2px; }
+/* 브랜드 로고 아이콘 */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* 아이콘과 글자 사이 간격 */
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: #fff; /* ← 흰색으로 변경 */
+}
+
+.brand-logo {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  vertical-align: middle;
+}
+
+
+.brand-text {
+  display: inline-block;
+}
+
+.notification-badge {
+    display: inline-block;
+    position: absolute;
+    top: 2px;
+    right: -2px;
+    background-color: #ff4d4f;
+    color: white;
+    font-size: 11px;
+    font-weight: bold;
+    width: 18px;
+    height: 18px;
+    line-height: 18px;
+    text-align: center;
+    border-radius: 50%;
+    box-shadow: 0 0 3px rgba(0,0,0,0.3);
+}
+
+.menu-link {
+    position: relative; /* badge의 absolute 포지셔닝 기준점 */
+}

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/admin_layout}">
+<head>
+    <title>FAQ 상세</title>
+    <th:block layout:fragment="css">
+        <style>
+            .admin-container {
+                max-width: 1200px;
+                margin: 20px auto;
+                padding: 30px;
+            }
+            .card-header { background-color: #f1f1f1; }
+            .card-body { min-height: 300px; white-space: pre-wrap; }
+        </style>
+    </th:block>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container admin-container" th:if="${faq != null}">
+        <h3>FAQ 상세</h3>
+        <hr>
+        <div class="card">
+            <div class="card-header">
+                <h4>
+                    <span class="badge badge-info mr-2" th:text="${faq.category}"></span>
+                    <span th:text="${faq.question}"></span>
+                </h4>
+            </div>
+            <div class="card-body">
+                <p th:text="${faq.answer}"></p>
+            </div>
+            <div class="card-footer text-right">
+                <a th:href="@{/admin/faq/list(pageNum=${cri.pageNum}, amount=${cri.amount})}" class="btn btn-secondary">목록</a>
+                <a th:href="@{/admin/faq/modify(faq_id=${faq.faq_id}, pageNum=${cri.pageNum}, amount=${cri.amount})}" class="btn btn-primary">수정</a>
+                <button type="button" id="deleteBtn" class="btn btn-danger">삭제</button>
+            </div>
+        </div>
+    </div>
+
+    <form id="deleteForm" th:action="@{/admin/faq/delete}" method="post" style="display: none;" th:if="${faq != null}">
+        <input type="hidden" name="faq_id" th:value="${faq.faq_id}">
+        <input type="hidden" name="pageNum" th:value="${cri.pageNum}">
+        <input type="hidden" name="amount" th:value="${cri.amount}">
+    </form>
+</div>
+
+<th:block layout:fragment="script">
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const deleteBtn = document.getElementById('deleteBtn');
+            if (deleteBtn) {
+                deleteBtn.addEventListener('click', function () {
+                    if (confirm("정말로 삭제하시겠습니까?")) {
+                        document.getElementById('deleteForm').submit();
+                    }
+                });
+            }
+        });
+    </script>
+</th:block>
+
+</body>
+</html>

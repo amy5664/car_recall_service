@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/admin_layout}">
+<head>
+    <title>공지사항 관리</title>
+    <th:block layout:fragment="css">
+        <style>
+            .admin-container {
+                max-width: 1200px;
+                margin: 20px auto;
+                padding: 30px;
+            }
+            .table-hover tbody tr:hover { cursor: pointer; }
+            .pagination { justify-content: center; }
+        </style>
+    </th:block>
+</head>
+<div layout:fragment="content">
+<div class="container admin-container">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3>공지사항 관리</h3>
+        <a th:href="@{/admin/notice/write}" class="btn btn-primary">글쓰기</a>
+    </div>
+
+    <table class="table table-hover text-center">
+        <thead class="thead-light">
+        <tr>
+            <th>번호</th>
+            <th style="width: 50%;">제목</th>
+            <th>조회수</th>
+            <th>작성일</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:if="${list.isEmpty()}">
+            <td colspan="4">등록된 공지사항이 없습니다.</td>
+        </tr>
+        <tr th:each="item : ${list}" th:onclick="|location.href='@{/admin/notice/detail(notice_id=${item.notice_id}, pageNum=${pageMaker.cri.pageNum}, amount=${pageMaker.cri.amount})}'|" style="cursor: pointer;">
+            <td th:text="${item.notice_id}"></td>
+                <td class="text-left">
+                <span th:if="${item.is_urgent == 'Y'}" class="badge badge-danger mr-2">긴급</span>
+                <span th:text="${item.title}"></span>
+                </td>
+            <td th:text="${item.views}"></td>
+            <td th:text="${#strings.substring(item.created_at, 0, 10)}"></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- Pagination -->
+    <nav class="mt-4">
+        <ul class="pagination">
+            <li class="page-item" th:if="${pageMaker.prev}">
+                <a class="page-link" th:href="@{/admin/notice/list(pageNum=${pageMaker.startPage - 1}, amount=${pageMaker.cri.amount})}">Previous</a>
+            </li>
+
+            <li class="page-item" th:each="num : ${#numbers.sequence(pageMaker.startPage, pageMaker.endPage)}" th:classappend="${pageMaker.cri.pageNum == num} ? 'active'">
+                <a class="page-link" th:href="@{/admin/notice/list(pageNum=${num}, amount=${pageMaker.cri.amount})}" th:text="${num}"></a>
+            </li>
+
+            <li class="page-item" th:if="${pageMaker.next}">
+                <a class="page-link" th:href="@{/admin/notice/list(pageNum=${pageMaker.endPage + 1}, amount=${pageMaker.cri.amount})}">Next</a>
+            </li>
+        </ul>
+    </nav>
+    <!-- /Pagination -->
+</div>
+</div>
+</html>

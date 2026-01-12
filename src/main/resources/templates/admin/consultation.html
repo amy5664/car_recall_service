@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{layout/admin_layout}">
+<head>
+    <title>상담 대시보드 - 관리자</title>
+    <th:block layout:fragment="css">
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+            body {
+                font-family: 'Inter', 'Pretendard', sans-serif;
+                background: #0F172A;
+                color: #E2E8F0;
+            }
+        </style>
+    </th:block>
+</head>
+<div layout:fragment="content">
+    <!-- 현재 로그인한 사용자 정보 전달 -->
+    <div th:attr="data-agent-id=${#authentication.principal.username}, data-agent-name=${#authentication.principal.name}"
+         style="display: none;"></div>
+
+    <noscript>
+        <p style="color: red; padding: 20px; text-align: center;">
+            JavaScript가 비활성화되어 있습니다. 상담 대시보드를 사용하려면 JavaScript를 활성화해주세요.
+        </p>
+    </noscript>
+</div>
+<th:block layout:fragment="script">
+    <script th:src="@{/js/admin-consultation-dashboard.js}"></script>
+</th:block>
+</html>

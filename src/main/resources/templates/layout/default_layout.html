@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <!-- layout:title-pattern 을 사용하면 각 페이지의 title을 동적으로 설정 가능 -->
+    <title layout:title-pattern="$CONTENT_TITLE - $LAYOUT_TITLE">자동차 리콜 통합센터</title>
+
+    <!-- 1. 공통 CSS 파일 -->
+    <link rel="stylesheet" th:href="@{/css/main.css}" />
+    <link rel="stylesheet" th:href="@{/css/header.css}" />
+    <link rel="stylesheet" th:href="@{/css/footer.css}" />
+
+    <!-- 2. 각 페이지의 고유한 CSS를 위한 공간 -->
+    <th:block layout:fragment="css"></th:block>
+</head>
+<body>
+    <!-- 공통 헤더 -->
+    <div th:replace="~{fragment/header :: headerFragment}"></div>
+
+    <!-- 3. 각 페이지의 실제 내용이 삽입될 공간 -->
+    <th:block layout:fragment="content"></th:block>
+
+    <!-- 공통 푸터 -->
+    <div th:replace="~{fragment/footer :: footerFragment}"></div>
+
+    <!-- 4. 공통 스크립트 -->
+    <script th:src="@{/js/jquery.js}"></script>
+    <script th:src="@{/js/chat.js}"></script>
+    <!-- 5. 각 페이지의 고유한 스크립트를 위한 공간 -->
+    <th:block layout:fragment="script"></th:block>
+</body>
+</html>

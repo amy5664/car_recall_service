@@ -1,0 +1,74 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.boot.dao.ComplainDAO">
+
+	 <resultMap id="Map" type="com.boot.dto.ComplainDTO">
+        <result property="report_id" column="REPORT_ID"/>
+        <result property="reporter_name" column="REPORTER_NAME"/>
+        <result property="password" column="PASSWORD"/>
+        <result property="phone" column="PHONE"/>
+        <result property="title" column="TITLE"/>
+        <result property="complain_type" column="COMPLAIN_TYPE"/>
+        <result property="carNum" column="CARNUM"/>
+        <result property="is_public" column="IS_PUBLIC"/>
+        <result property="complainDate" column="COMPLAINDATE"/>
+        <result property="content" column="CONTENT"/>
+        <result property="answer" column="ANSWER"/>
+        <result property="status" column="STATUS"/>
+    </resultMap>
+
+    <select id="complain_list" resultMap="Map">
+        select REPORT_ID, REPORTER_NAME, PASSWORD, PHONE, TITLE, COMPLAIN_TYPE, CARNUM, IS_PUBLIC, CONTENT, ANSWER, COMPLAINDATE, STATUS
+        from ONLINE_COMPLAIN
+        order by REPORT_ID desc
+    </select>
+   
+    <select id="find_modify_content" parameterType="hashmap" resultMap="Map">
+        select REPORT_ID, REPORTER_NAME, PASSWORD, PHONE, TITLE, COMPLAIN_TYPE, CARNUM, IS_PUBLIC, CONTENT, ANSWER, COMPLAINDATE, STATUS
+        from ONLINE_COMPLAIN
+        where REPORT_ID = #{report_id}
+    </select>
+    
+     <insert id="complain_write" useGeneratedKeys="true" keyProperty="report_id" parameterType="com.boot.dto.ComplainDTO">
+    	insert into online_complain(reporter_name, password, phone, title, COMPLAIN_TYPE, carNum, is_public, content, status, complainDate)
+    	values(#{reporter_name}, #{password}, #{phone}, #{title}, #{complain_type}, #{carNum}, #{is_public}, #{content}, #{status}, NOW())
+    </insert>
+    
+      <select id="contentView" parameterType="hashmap" resultMap="Map">
+    	select REPORT_ID, REPORTER_NAME, PASSWORD, PHONE, TITLE, COMPLAIN_TYPE, CARNUM, IS_PUBLIC, CONTENT, ANSWER, COMPLAINDATE, STATUS
+        from ONLINE_COMPLAIN
+        where REPORT_ID = #{report_id}
+    </select>
+    
+    <update id="update" parameterType="com.boot.dto.ComplainDTO">
+    	update online_complain 
+    	set title=#{title}, 
+    	    COMPLAIN_TYPE=#{complain_type}, 
+    	    content=#{content} 
+    	where report_id=#{report_id}
+    </update>
+    
+    <delete id="complain_delete">
+    	delete from online_complain where report_id=#{report_id}
+    </delete>
+
+    <update id="updateAnswer" parameterType="hashmap">
+        UPDATE ONLINE_COMPLAIN
+        SET ANSWER = #{answer}, STATUS = '답변 완료'
+        WHERE REPORT_ID = #{report_id}
+    </update>
+
+    <select id="getComplainById" parameterType="int" resultMap="Map">
+        SELECT * FROM ONLINE_COMPLAIN WHERE report_id = #{reportId}
+    </select>
+
+    <select id="getComplainListByReporterName" resultMap="Map">
+        SELECT REPORT_ID, REPORTER_NAME, PASSWORD, PHONE, TITLE, COMPLAIN_TYPE, CARNUM, IS_PUBLIC, CONTENT, ANSWER, COMPLAINDATE, STATUS
+        FROM ONLINE_COMPLAIN
+        WHERE REPORTER_NAME = #{reporterName}
+        ORDER BY REPORT_ID DESC
+    </select>
+
+</mapper>

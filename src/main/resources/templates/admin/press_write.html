@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/admin_layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>리콜 보도자료 작성</title>
+    <th:block layout:fragment="css">
+        <style>
+            .container {
+                width: 80%;
+                margin: 40px auto;
+                background: #fff;
+                border-radius: 10px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                padding: 40px 50px;
+            }
+            h2 {
+                text-align: center;
+                font-size: 26px;
+                margin-bottom: 30px;
+                color: #333;
+            }
+            form {
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+            }
+            label {
+                font-weight: 600;
+                color: #444;
+                margin-bottom: 5px;
+            }
+            input[type="text"], textarea {
+                width: 100%;
+                padding: 10px 12px;
+                border: 1px solid #ccc;
+                border-radius: 6px;
+                font-size: 15px;
+                resize: none;
+                box-sizing: border-box;
+            }
+            textarea {
+                min-height: 300px;
+            }
+            input[type="file"] {
+                margin-top: 5px;
+            }
+            .uploadResult {
+                margin-top: 10px;
+            }
+            .uploadResult ul {
+                list-style: none;
+                padding: 0;
+            }
+            .uploadResult li {
+                margin: 6px 0;
+                font-size: 14px;
+                color: #007bff;
+            }
+            .btn-area {
+                display: flex;
+                justify-content: center;
+                gap: 15px;
+                margin-top: 30px;
+            }
+            .btn-area button, .btn-area a {
+                background-color: #007bff;
+                color: white;
+                padding: 10px 25px;
+                border: none;
+                border-radius: 6px;
+                font-size: 15px;
+                text-decoration: none;
+                cursor: pointer;
+                transition: background-color 0.2s ease;
+            }
+            .btn-area button:hover, .btn-area a:hover {
+                background-color: #0056b3;
+            }
+            hr {
+                border: none;
+                border-top: 1px solid #ddd;
+                margin: 20px 0;
+            }
+        </style>
+    </th:block>
+</head>
+<div layout:fragment="content">
+    <div class="container">
+        <h2>리콜 보도자료 작성</h2>
+        <hr>
+    
+        <form th:action="@{/admin/press/write}" method="post" enctype="multipart/form-data" id="writeForm">
+            <input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            <div>
+                <label for="boardTitle">제목</label>
+                <input type="text" id="boardTitle" name="boardTitle" placeholder="제목을 입력하세요" required>
+            </div>
+    
+            <div>
+                <label for="boardName">작성자</label>
+                <input type="text" id="boardName" name="boardName" th:value="${#authentication.name}" readonly required>
+            </div>
+    
+            <div>
+                <label for="boardContent">내용</label>
+                <textarea id="boardContent" name="boardContent" placeholder="내용을 입력하세요" required></textarea>
+            </div>
+    
+            <div>
+                <label for="uploadFile">첨부 파일</label>
+                <input type="file" name="uploadFile" id="uploadFile" multiple>
+            </div>
+    
+            <div class="uploadResult">
+                <ul></ul>
+            </div>
+    
+            <div class="btn-area">
+                <button type="submit">등록</button>
+                <a th:href="@{/admin/press/list}" style="line-height: 1.5;">목록으로</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<th:block layout:fragment="script">
+    <script th:inline="javascript">
+        $(document).ready(function() {
+            const regex = new RegExp("(.*?)\.(exe|sh|js|alz)$");
+            const maxSize = 5242880; // 5MB
+    
+            function checkExtension(fileName, fileSize) {
+                if (fileSize > maxSize) {
+                    alert("파일 크기가 5MB를 초과할 수 없습니다.");
+                    return false;
+                }
+                if (regex.test(fileName)) {
+                    alert("해당 종류의 파일은 업로드할 수 없습니다.");
+                    return false;
+                }
+                return true;
+            }
+    
+            $("#uploadFile").change(function(e) {
+                const uploadUL = $(".uploadResult ul");
+                uploadUL.empty();
+                const files = this.files;
+    
+                for (let i = 0; i < files.length; i++) {
+                    if (!checkExtension(files[i].name, files[i].size)) {
+                        // 유효성 검사 실패 시 파일 선택 초기화
+                        $(this).val("");
+                        return false;
+                    }
+                    
+                    // FileReader를 사용한 클라이언트 측 미리보기
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        let str = "<li>";
+                        if (files[i].type.startsWith("image/")) {
+                            str += "<img src='" + e.target.result + "' width='80'>";
+                        } else {
+                            str += "<img src='" + /*[[@{/img/attach.png}]]*/ '' + "' width='20'>";
+                        }
+                        str += "<span>" + files[i].name + "</span></li>";
+                        uploadUL.append(str);
+                    };
+                    reader.readAsDataURL(files[i]);
+                }
+            });
+        });
+    </script>
+</th:block>
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default_layout}">
+<head>
+    <title>리콜센터 소개</title>
+    <th:block layout:fragment="css">
+        <!-- 페이지 전용 CSS -->
+        <link rel="stylesheet" th:href="@{/css/centers_about.css}" />
+    </th:block>
+</head>
+<div layout:fragment="content">
+<main class="ci-intro">
+    <!-- 1) 풀-블리드 히어로(영상) -->
+    <section class="ci-hero-full" aria-labelledby="heroTitle">
+      <video class="ci-hero-full__video" autoplay muted loop playsinline preload="metadata"
+             th:poster="@{/assets/centers/center_poster.jpg}">
+        <source th:src="@{/video/about.mp4}" type="video/mp4"/>
+      </video>
+      <div class="ci-hero-full__scrim"></div>
+      <div class="ci-hero-full__inner">
+        <h1 id="heroTitle" class="ci-hero-full__title">자동차 리콜 통합센터</h1>
+        <p class="ci-hero-full__lead">
+          <strong>자동차 리콜 정보를 한곳에서 확인하고 관리할 수 있는 통합 플랫폼</strong>입니다.<br/>
+          결함 신고부터 대상 조회, 온라인 접수, 지정 센터 <strong>전액 무상 수리</strong>까지<br/>
+          사용자가 <strong>쉽고 투명하게 리콜 절차를 진행</strong>할 수 있도록 설계되었습니다.
+        </p>
+      </div>
+    </section>
+
+
+      <!-- 공통 컨테이너 -->
+      <div class="ci-container">
+
+        <!-- 2) 소개(에디토리얼 2단) -->
+        <section class="ci-about" aria-labelledby="aboutTitle">
+          <div class="ci-about__grid">
+            <!-- 왼쪽: 소개 본문 -->
+            <article class="ci-about__main">
+              <h2 id="aboutTitle">센터 소개</h2>
+              <p>
+                자동차 리콜 통합센터는 <strong>공공 데이터</strong>를 기반으로 제작된
+                <strong>자동차 리콜 정보 통합 플랫폼</strong>입니다.
+                제조사, 정부, 소비자 간의 정보를 하나의 창구에서 연결하여
+                보다 <strong>신속하고 투명한 리콜 서비스</strong>를 제공합니다.
+              </p>
+              <p>
+                결함 신고부터 조사, 공지, 무상수리, 종결에 이르는
+                <strong>표준화된 5단계 절차</strong>를 통해
+                지역과 제조사에 관계없이 동일한 품질의 서비스를 이용할 수 있습니다.
+              </p>
+              <p>
+                온라인으로 간편하게 리콜을 신청하고, 가까운 지정 센터에서 수리를 받을 수 있습니다.
+                모든 리콜 조치는 소유주 변경과 관계없이 <strong>전액 무상</strong>으로 제공됩니다.
+              </p>
+            </article>
+
+            <!-- 오른쪽: 핵심 키워드 -->
+            <aside class="ci-about__side" aria-label="핵심 키워드">
+              <ul class="ci-chips">
+                <li>표준 5단계</li>
+                <li>전액 무상</li>
+                <li>진행 상황 공개</li>
+              </ul>
+              <p class="ci-note">
+                * 개인정보와 차량 정보는 안전하게 보호되며,
+                모든 리콜 절차와 진행 상황은 투명하게 공개됩니다.
+              </p>
+            </aside>
+          </div>
+        </section>
+
+
+            <!-- 3) 절차 타임라인(가로 스트립) -->
+            <section class="ci-steps ci-steps--snake2" aria-labelledby="processTitle">
+              <h2 id="processTitle">리콜 처리 절차</h2>
+
+              <div class="snake-wrap">
+                <!-- ★ JS 없이 동작하는 퍼센트 좌표 SVG -->
+                <svg class="snake-static" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+                  <defs>
+                    <marker id="arrow-end-static" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                      <polygon points="0,0 8,4 0,8" fill="#7da2ff"></polygon>
+                    </marker>
+                  </defs>
+
+                  <!-- 1→2 -->
+                  <path class="snake-path" d="M 16.66 25 L 50 25"/>
+                  <!-- 2→3 -->
+                  <path class="snake-path" d="M 50 25 L 83.33 25"/>
+                  <!-- 3↓4 -->
+                  <path class="snake-path" d="M 83.33 25 Q 83.33 50 83.33 62.5"/>
+                  <!-- 4←5 -->
+                  <path class="snake-path" d="M 83.33 75 L 50 75"/>
+                </svg>
+
+                <!-- 카드 그리드 -->
+                <ol class="snake-grid no-list" role="list">
+                  <li id="step1" class="step-card">
+                    <span class="num">1</span><span class="label">접수</span><small>대상 확인·신청</small>
+                  </li>
+                  <li id="step2" class="step-card">
+                    <span class="num">2</span><span class="label">조사</span><small>원인 분석</small>
+                  </li>
+                  <li id="step3" class="step-card">
+                    <span class="num">3</span><span class="label">공지</span><small>고객 통지</small>
+                  </li>
+                  <li id="step4" class="step-card">
+                    <span class="num">4</span><span class="label">무상수리</span><small>지정 센터</small>
+                  </li>
+                  <li id="step5" class="step-card">
+                    <span class="num">5</span><span class="label">종결</span><small>사후 점검</small>
+                  </li>
+                </ol>
+              </div>
+            </section>
+          </div><!-- /ci-container -->
+</main>
+</div>
+<th:block layout:fragment="script">
+    <!-- 페이지 전용 JS -->
+    <script th:src="@{/js/centers_about.js}"></script>
+</th:block>
+</html>

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default_layout}">
+<head>
+    <title>내 알림</title>
+    <th:block layout:fragment="css">
+        <style>
+        /* 기존 my-notifications-container 스타일을 제거하거나 조정 */
+        /* .my-notifications-container {
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 30px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        } */
+        .my-notifications-container h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .notification-list {
+            list-style: none;
+            padding: 0;
+        }
+        .notification-item {
+            display: flex;
+            flex-direction: column;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            position: relative;
+        }
+        .notification-item.unread {
+            background-color: #e6f7ff; /* 읽지 않은 알림 배경색 */
+            border-color: #91d5ff;
+        }
+        .notification-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .notification-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #333;
+        }
+        .notification-meta {
+            font-size: 0.85rem;
+            color: #888;
+            display: flex;
+            align-items: center;
+        }
+        .unread-badge {
+            background-color: #ff4d4f;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+        .notification-message {
+            font-size: 0.95rem;
+            color: #555;
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+        .notification-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        .notification-link {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: background-color 0.2s;
+        }
+        .notification-link:hover {
+            background-color: #0056b3;
+        }
+        .mark-as-read-btn {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: background-color 0.2s;
+        }
+        .mark-as-read-btn:hover {
+            background-color: #5a6268;
+        }
+        .no-notifications {
+            text-align: center;
+            color: #888;
+            padding: 30px;
+            border: 1px dashed #ccc;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        /* .container 클래스에 맞게 여백 조정 */
+        main.container {
+            padding-top: 50px;
+            padding-bottom: 50px;
+        }
+        </style>
+    </th:block>
+</head>
+<div layout:fragment="content">
+    <main class="container">
+        <div class="my-notifications-container">
+            <h1>내 알림</h1>
+
+            <p th:if="${message}" class="alert alert-success" th:text="${message}"></p>
+            <p th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></p>
+
+            <div th:if="${not #lists.isEmpty(notifications)}">
+                <ul class="notification-list">
+                    <li th:each="notification : ${notifications}" class="notification-item" th:classappend="${!notification.read} ? 'unread'">
+                        <div class="notification-header">
+                            <span class="notification-title">
+                                <span th:if="${!notification.read}" class="unread-badge">NEW</span>
+                                <span th:text="${notification.title}"></span>
+                            </span>
+                            <span class="notification-meta">
+                                <span th:text="${notification.formattedCreatedAt}"></span>
+                            </span>
+                        </div>
+                        <div class="notification-message" th:utext="${notification.message}"></div>
+                        <div class="notification-actions">
+                            <a th:if="${not #strings.isEmpty(notification.link)}" th:href="${notification.link}" class="notification-link">자세히 보기</a>
+                            <form th:if="${!notification.read}" th:action="@{/my-notifications/mark-as-read}" method="post" style="display: inline;">
+                                <input type="hidden" name="id" th:value="${notification.id}" />
+                                <button type="submit" class="mark-as-read-btn">읽음 처리</button>
+                            </form>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div th:if="${#lists.isEmpty(notifications)}">
+                <p class="no-notifications">새로운 알림이 없습니다.</p>
+            </div>
+        </div>
+    </main>
+</div>
+<th:block layout:fragment="script">
+     <script th:inline="javascript">
+        // 페이지 로드 시 메시지 팝업
+        window.onload = function() {
+            const message = /*[[${message}]]*/ null;
+            const errorMessage = /*[[${errorMessage}]]*/ null;
+            if (message) {
+                alert(message);
+            }
+            if (errorMessage) {
+                alert("오류: " + errorMessage);
+            }
+        };
+    </script>
+</th:block>
+</html>

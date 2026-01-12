@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default_layout}">
+<head>
+    <title>결함 신고 상태</title>
+</head>
+<div layout:fragment="content">
+    <div class="container">
+        <h2>결함 신고 상태</h2>
+        <div th:if="${complain}">
+            <p><strong>신고 번호:</strong> <span th:text="${complain.report_id}"></span></p>
+            <p><strong>신고일:</strong> <span th:text="${complain.complainDate}"></span></p>
+            <p><strong>제목:</strong> <span th:text="${complain.title}"></span></p>
+            <p><strong>내용:</strong> <span th:text="${complain.content}"></span></p>
+            <p><strong>답변:</strong> <span th:text="${complain.answer}"></span></p>
+            <p><strong>상태:</strong> <span th:text="${complain.status}"></span></p>
+        </div>
+        <div th:if="${complain == null}">
+            <p>해당하는 신고 정보를 찾을 수 없습니다.</p>
+        </div>
+    </div>
+</div>
+</html>

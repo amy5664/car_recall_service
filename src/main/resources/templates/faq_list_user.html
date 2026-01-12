@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{layout/default_layout}">
+<head>
+    <title>자주 묻는 질문 (FAQ)</title>
+    <th:block layout:fragment="css">
+        <link rel="stylesheet" th:href="@{/css/faq.css}" />
+    </th:block>
+</head>
+<div layout:fragment="content">
+<main class="fq">
+  <section class="fq-wrap">
+    <header class="fq-head">
+      <div class="fq-head-text">
+        <h1 class="fq-title">자주 묻는 질문 (FAQ)</h1>
+        <p class="fq-desc">자주 받는 질문을 모았습니다. 질문을 클릭하면 답변이 펼쳐집니다.</p>
+      </div>
+    </header>
+
+    <!-- 아코디언 목록 -->
+    <div class="fq-accordion" id="faqList">
+      <div class="fq-empty" th:if="${list.isEmpty()}">등록된 FAQ가 없습니다.</div>
+
+      <article class="fq-item" th:each="item : ${list}" th:data-id="${item.faq_id}">
+          <button type="button" class="fq-q" aria-expanded="false" th:aria-controls="|fq-a-${item.faq_id}|">
+            <span class="fq-chip" th:text="${item.category}"></span>
+            <span class="fq-q-text" th:text="${item.question}"></span>
+            <span class="fq-arrow" aria-hidden="true">▾</span>
+          </button>
+          <div th:id="|fq-a-${item.faq_id}|" class="fq-a" role="region" aria-hidden="true">
+            <div class="fq-a-inner">
+              <pre class="fq-a-text" th:text="${item.answer}"></pre>
+              <div class="fq-meta"><strong>작성일</strong> <span th:text="${item.created_at}"></span></div>
+            </div>
+          </div>
+        </article>
+    </div>
+
+    <!-- 하단 영역: 페이지네이션 및 문의하기 버튼 -->
+    <div class="fq-footer">
+      <!-- 페이지네이션 -->
+      <nav class="fq-paging" aria-label="FAQ 페이지 이동" th:if="${pageMaker.total > 0}">
+        <ul>
+          <li th:if="${pageMaker.prev}">
+            <a class="fq-page" th:href="@{/faq/list(pageNum=${pageMaker.startPage - 1})}">이전</a>
+          </li>
+          <li th:each="num : ${#numbers.sequence(pageMaker.startPage, pageMaker.endPage)}">
+              <a class="fq-page"
+                 th:classappend="${pageMaker.cri.pageNum == num} ? 'is-active'"
+                 th:href="@{/faq/list(pageNum=${num})}" th:text="${num}"></a>
+          </li>
+          <li th:if="${pageMaker.next}">
+            <a class="fq-page" th:href="@{/faq/list(pageNum=${pageMaker.endPage + 1})}">다음</a>
+          </li>
+        </ul>
+      </nav>
+      <!-- 문의하기 버튼 -->
+      <div class="fq-footer-action" sec:authorize="isAuthenticated()">
+        <a th:href="@{/complain_write_view}" class="fq-btn">문의하기</a>
+      </div>
+    </div>
+  </section>
+</main>
+</div>
+<th:block layout:fragment="script">
+<script>
+  document.querySelectorAll('.fq-q').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const expanded = btn.getAttribute('aria-expanded') === 'true';
+      const panel = document.getElementById(btn.getAttribute('aria-controls'));
+
+      // 토글
+      btn.setAttribute('aria-expanded', String(!expanded));
+      panel.setAttribute('aria-hidden', String(expanded));
+      btn.parentElement.classList.toggle('is-open', !expanded);
+    });
+  });
+</script>
+</th:block>
+</html>

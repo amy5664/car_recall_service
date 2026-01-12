@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default_layout}">
+<head>
+    <title>결함 신고 조회</title>
+</head>
+<div layout:fragment="content">
+    <div class="container">
+        <h2>결함 신고 조회</h2>
+        <form th:action="@{/complain_check}" method="post">
+            <div class="form-group">
+                <label for="report_id">신고 번호</label>
+                <input type="text" id="report_id" name="report_id" required>
+            </div>
+            <div class="form-group">
+                <label for="password">비밀번호</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit" class="submit-btn">조회하기</button>
+        </form>
+        <div th:if="${param.error}" class="alert alert-danger">
+            신고 번호 또는 비밀번호가 일치하지 않습니다.
+        </div>
+    </div>
+</div>
+</html>

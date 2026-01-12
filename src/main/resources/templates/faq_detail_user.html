@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default_layout}">
+<head>
+    <title th:text="|FAQ - ${faq.question}|">FAQ 상세</title>
+    <th:block layout:fragment="css">
+        <link rel="stylesheet" th:href="@{/css/faq.css}" />
+    </th:block>
+</head>
+<div layout:fragment="content">
+<main class="fq">
+  <section class="fq-wrap">
+    <nav class="fq-breadcrumb" aria-label="경로">
+      <a th:href="@{/}" class="fq-crumb">홈</a>
+      <span class="fq-crumb-sep">/</span>
+      <a th:href="@{/faq/list}" class="fq-crumb">FAQ</a>
+    </nav>
+
+    <article class="fq-card" th:if="${faq != null}" th:object="${faq}">
+      <header class="fq-card-head">
+        <h1 class="fq-card-title">
+          <span class="fq-chip" th:text="*{category}"></span>
+          <span th:text="*{question}"></span>
+        </h1>
+        <ul class="fq-meta">
+          <li><strong>작성일</strong> <span th:text="*{created_at}"></span></li>
+        </ul>
+      </header>
+
+      <div class="fq-content">
+        <pre class="fq-a-text" th:text="*{answer}"></pre>
+      </div>
+
+      <footer class="fq-card-foot">
+        <a th:href="@{/faq/list}" class="fq-btn">목록으로</a>
+      </footer>
+    </article>
+  </section>
+</main>
+</div>
+</html>

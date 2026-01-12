@@ -1,0 +1,106 @@
+<!-- 1. 헤더 스타일 조각 (메뉴 깨짐 방지용) -->
+<th:block th:fragment="header-style">
+    <style>
+        .menu-item {
+            white-space: nowrap; /* 메뉴 항목의 글자가 줄바꿈되지 않도록 설정 */
+        }
+        .btn-logout {
+            background: none; border: none; padding: 0;
+            font: inherit; cursor: pointer; color: inherit;
+        }
+    </style>
+</th:block>
+
+<!-- 2. 실제 헤더 내용 조각 -->
+<header class="site-header" th:fragment="headerFragment">
+    <div class="header-inner">
+        <a class="brand" th:href="@{/}">
+            <img th:src="@{/img/car.png}" class="brand-logo" alt="자동차 아이콘">
+            <span class="brand-text">자동차 리콜 통합센터</span>
+        </a>
+
+        <div class="header-search">
+            <form th:action="@{/search}" method="get" th:object="${#object.empty}">
+                <input type="text" name="query" placeholder="통합 검색..." th:value="${query}" />
+                <button type="submit">검색</button>
+            </form>
+        </div>
+
+        <!-- 모바일 메뉴 토글 -->
+        <button class="nav-toggle" aria-controls="global-nav" aria-expanded="false" aria-label="메뉴 열기">
+            <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+        </button>
+
+        <nav id="global-nav" class="nav" aria-label="주 메뉴">
+            <ul class="menu">
+
+                <!-- 관리자 메뉴 -->
+                <th:block sec:authorize="hasAuthority('ROLE_ADMIN')">
+                    <li class="menu-item has-sub">
+                        <a th:href="@{/admin/main}" class="menu-link">관리자 홈</a>
+                        <ul class="submenu">
+                            <li><a th:href="@{/admin/defect_reports}">결함 신고 관리</a></li>
+                            <li><a th:href="@{/admin/notice/list}">공지사항 관리</a></li>
+                            <li><a th:href="@{/admin/faq/list}">FAQ 관리</a></li>
+                            <li><a th:href="@{/admin/press/list}">보도자료 관리</a></li>
+                            <li><a th:href="@{/admin/complain/list}">고객 문의 관리</a></li>
+                        </ul>
+                    </li>
+                </th:block>
+
+                <!-- 일반 사용자 및 비로그인 사용자 공통 메뉴 -->
+                <th:block sec:authorize="!hasAuthority('ROLE_ADMIN')">
+                    <li class="menu-item has-sub">
+                        <a th:href="@{/report/write}" class="menu-link">결함신고</a>
+                        <ul class="submenu">
+                            <li><a th:href="@{/report/write}">신고</a></li>
+                            <li><a th:href="@{/report/history}">신고내역</a></li>
+                        </ul>
+                    </li>
+                    <li class="menu-item has-sub">
+                        <a th:href="@{/recall-status}" class="menu-link">리콜 정보</a>
+                        <ul class="submenu">
+                            <li><a th:href="@{/recall-status}">리콜현황</a></li>
+                            <li><a th:href="@{/recall/stats}">리콜통계</a></li>
+                            <li><a th:href="@{/board/list}">리콜 보도자료</a></li>
+                        </ul>
+                    </li>
+                    <li class="menu-item has-sub">
+                        <a href="#" class="menu-link">리콜 센터</a>
+                        <ul class="submenu">
+                            <li><a th:href="@{/notice/list}">공지사항</a></li>
+                            <li><a th:href="@{/faq/list}">FAQ</a></li>
+                            <li sec:authorize="isAuthenticated()"><a th:href="@{/complain_write_view}">온라인 상담</a></li>
+                            <li sec:authorize="isAuthenticated()"><a th:href="@{/complain_list}">내 문의 내역</a></li>
+                            <li><a th:href="@{/centers/about}">리콜센터 소개</a></li>
+                            <li><a th:href="@{/centers/map}">주변 리콜센터 찾기</a></li>
+                        </ul>
+                    </li>
+                    <li class="menu-item" sec:authorize="isAuthenticated()">
+                        <a href="/my-vehicles" class="menu-link">차량 관리</a>
+                    </li>
+                    <li class="menu-item" sec:authorize="isAuthenticated()">
+                        <a href="/my-notifications" class="menu-link">
+                            내 알림
+                            <span th:if="${unreadNotificationCount > 0}"
+                                  th:text="${unreadNotificationCount}" class="notification-badge"></span>
+                        </a>
+                    </li>
+                </th:block>
+
+                <!-- 비로그인 시에만 보이는 로그인 버튼 -->
+                <li sec:authorize="isAnonymous()" class="menu-item">
+                    <a th:href="@{/login}" class="menu-link">로그인</a>
+                </li>
+
+                <!-- 로그아웃 버튼 (모든 로그인 사용자) -->
+                <li sec:authorize="isAuthenticated()" class="menu-item">
+                    <form th:action="@{/logout}" method="post" class="menu-link" style="padding:0;" th:object="${#object.empty}">
+                        <button type="submit" class="btn-logout" style="padding: 10px 14px;">로그아웃</button>
+                    </form>
+                </li>
+
+            </ul>
+        </nav>
+    </div>
+</header>

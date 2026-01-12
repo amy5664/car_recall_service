@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.boot.dao.NoticeDAO">
+    <resultMap id="noticeResultMap" type="com.boot.dto.NoticeDTO">
+        <result property="notice_id" column="notice_id"/>
+        <result property="title" column="title"/>
+        <result property="content" column="content"/>
+        <result property="views" column="views"/>
+        <result property="created_at" column="created_at"/>
+        <result property="is_urgent" column="is_urgent"/>
+    </resultMap>
+
+    <select id="listWithPaging" resultMap="noticeResultMap">
+        SELECT notice_id, title, views, DATE_FORMAT(created_at, '%Y-%m-%d') as created_at, is_urgent
+        FROM RECALL_NOTICE_DB
+        ORDER BY is_urgent DESC, notice_id DESC
+        LIMIT #{amount} OFFSET ${(pageNum - 1) * amount}
+    </select>
+
+    <select id="getTotalCount" resultType="int">
+        SELECT count(*) FROM RECALL_NOTICE_DB
+    </select>
+
+    <insert id="write" parameterType="com.boot.dto.NoticeDTO" useGeneratedKeys="true" keyProperty="notice_id">
+        INSERT INTO RECALL_NOTICE_DB (title, content, is_urgent)
+        VALUES (#{title}, #{content}, IFNULL(#{is_urgent, jdbcType=CHAR}, 'N'))
+    </insert>
+
+    <select id="getNotice" parameterType="long" resultMap="noticeResultMap">
+        SELECT notice_id, title, content, views, DATE_FORMAT(created_at, '%Y-%m-%d %H:%i') as created_at, is_urgent
+        FROM RECALL_NOTICE_DB
+        WHERE notice_id = #{notice_id}
+    </select>
+
+    <update id="incrementViews" parameterType="long">
+        UPDATE RECALL_NOTICE_DB
+        SET views = views + 1
+        WHERE notice_id = #{notice_id}
+    </update>
+
+    <update id="modify" parameterType="com.boot.dto.NoticeDTO">
+        UPDATE RECALL_NOTICE_DB
+        SET title = #{title},
+            content = #{content},
+            is_urgent = #{is_urgent},
+            updated_at = NOW()
+        WHERE notice_id = #{notice_id}
+    </update>
+
+    <delete id="delete" parameterType="long">
+        DELETE FROM RECALL_NOTICE_DB
+        WHERE notice_id = #{notice_id}
+    </delete>
+
+    <select id="searchByKeyword" parameterType="String" resultMap="noticeResultMap">
+        SELECT notice_id, title, content, views, DATE_FORMAT(created_at, '%Y-%m-%d') as created_at, is_urgent
+        FROM RECALL_NOTICE_DB
+        WHERE title LIKE CONCAT('%', #{keyword}, '%') OR content LIKE CONCAT('%', #{keyword}, '%')
+        ORDER BY notice_id DESC
+    </select>
+</mapper>

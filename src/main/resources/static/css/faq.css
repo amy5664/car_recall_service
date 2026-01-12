@@ -1,0 +1,88 @@
+/* ===== FAQ (User) – Notice와 톤 통일 ===== */
+.fq{
+  --brand:#144a96;
+  --ink:#0f172a;
+  --muted:#64748b;
+  --line:#e5e7eb;
+  --bg:#f7f8fa;
+  --card:#ffffff;
+  --soft:#f1f5f9;
+
+  background: var(--bg);
+  color: var(--ink);
+  min-height: 60vh;
+}
+
+.fq-wrap{ width:min(1200px,100%); margin:40px auto 56px; padding:0 20px; }
+
+/* Head */
+.fq-head{ margin-bottom:16px; }
+.fq-title{ font-size:clamp(20px,2.3vw,26px); font-weight:700; letter-spacing:-.2px; }
+.fq-desc{ margin-top:6px; color:var(--muted); font-size:14px; }
+
+/* Breadcrumb */
+.fq-breadcrumb{ margin-bottom:14px; font-size:13px; color:var(--muted); }
+.fq-crumb{ color:inherit; text-decoration:none; }
+.fq-crumb:hover{ text-decoration:underline; }
+.fq-crumb-sep{ margin:0 8px; color:#94a3b8; }
+
+/* Chip */
+.fq-chip{
+  display:inline-block; padding:6px 10px; border-radius:999px;
+  background:#e0f2fe; color:#075985; font-weight:700; font-size:12px; margin-right:8px;
+}
+
+/* Accordion */
+.fq-accordion{ border:1px solid var(--line); border-radius:14px; background:var(--card); overflow:hidden; }
+.fq-item{ border-bottom:1px solid var(--line); }
+.fq-item:last-child{ border-bottom:none; }
+
+.fq-q{
+  display:flex; align-items:center; gap:10px; width:100%;
+  text-align:left; background:#fff; border:0; padding:16px 18px;
+  font-size:15px; cursor:pointer;
+}
+.fq-q:focus{ outline:2px solid #bfdbfe; outline-offset:-2px; }
+
+.fq-q-text{ flex:1; }
+.fq-arrow{ transition: transform .2s ease; }
+.fq-item.is-open .fq-arrow{ transform: rotate(180deg); }
+
+.fq-a{ display:none; background:#fcfdff; }
+.fq-item.is-open .fq-a{ display:block; }
+.fq-a-inner{ padding:16px 18px 20px; border-top:1px solid var(--line); }
+.fq-a-text{ white-space:pre-wrap; font-family: inherit; line-height:1.7; }
+.fq-meta{ margin-top:10px; color:var(--muted); font-size:13px; }
+.fq-meta strong{ color:var(--ink); margin-right:6px; }
+
+/* Empty */
+.fq-empty{ padding:56px 16px; text-align:center; color:var(--muted); }
+
+/* Detail card (공지 상세 카드와 동일 구조) */
+.fq-card{ border:1px solid var(--line); border-radius:16px; background:var(--card); overflow:hidden; }
+.fq-card-head{ padding:22px 20px 12px; border-bottom:1px solid var(--line); }
+.fq-card-title{ font-size:clamp(18px,2vw,22px); font-weight:700; letter-spacing:-.2px; }
+.fq-content{ padding:24px 20px 28px; }
+.fq-card-foot{ padding:14px 20px 20px; border-top:1px solid var(--line); display:flex; justify-content:flex-end; }
+
+/* Button & Paging – Notice와 동일 */
+.fq-btn{ display:inline-flex; align-items:center; justify-content:center; min-width:108px; height:40px;
+  padding:0 14px; border-radius:10px; border:1px solid var(--line); background:#fff; color:var(--ink);
+  font-weight:600; font-size:14px; text-decoration:none;
+}
+.fq-btn:hover{ border-color:#cbd5e1; }
+
+.fq-paging{ display:flex; justify-content:center; margin-top:20px; }
+.fq-paging ul{ list-style:none; display:flex; gap:6px; padding:0; margin:0; }
+.fq-page{
+  display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:10px;
+  background:#fff; border:1px solid var(--line); text-decoration:none; color:var(--ink); font-size:14px;
+}
+.fq-page:hover{ border-color:#cbd5e1; }
+.fq-page.is-active{ color:#fff; background:var(--brand); border-color:transparent; }
+
+/* Responsive */
+@media (max-width:720px){
+  .fq-wrap{ margin:28px auto 40px; padding:0 16px; }
+  .fq-q{ padding:14px 14px; }
+}

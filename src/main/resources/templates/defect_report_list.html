@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default_layout}">
+<head>
+    <title>결함 신고 목록</title>
+    <th:block layout:fragment="css">
+    <style>
+        /* 이 페이지에만 적용될 추가적인 스타일 */
+        .container { 
+            padding-top: 50px; 
+            padding-bottom: 50px; 
+        }
+        .search-container { 
+            padding: 20px; 
+            background: #fff; 
+            margin-top: 20px; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+            text-align: center; 
+        }
+        .search-container form { 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            max-width: 500px; 
+            margin: 0 auto; 
+        }
+        .search-container input[type="text"] { 
+            flex-grow: 1; 
+            padding: 10px; 
+            border: 1px solid #ddd; 
+            border-radius: 4px; 
+            margin-right: 10px; 
+            min-width: 150px; 
+        }
+        .search-container button { 
+            padding: 10px 20px; 
+            background: #0d47a1; 
+            color: white; 
+            border: none; 
+            cursor: pointer; 
+            border-radius: 4px; 
+        }
+        table { width: 100%; margin-top: 20px; border-collapse: collapse; background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1); table-layout: fixed; }
+        th, td { padding: 8px; border-bottom: 1px solid #ddd; text-align: left; vertical-align: middle; word-wrap: break-word; }
+        th { background-color: #1e88e5; color: white; }
+        tr:hover { background-color: #f1f1f1; }
+        .col-small { width: 10%; }
+        .col-medium { width: 15%; }
+        .col-action { width: 10%; text-align: center; } /* 상세보기 버튼 컬럼 너비 및 정렬 */
+        .col-id { text-align: center; } /* 신고번호 컬럼 가운데 정렬 */
+        .pagination { text-align: center; margin-top: 20px; }
+        .pagination a, .pagination strong { display: inline-block; padding: 5px 10px; margin: 0 2px; border: 1px solid #ddd; background-color: #fff; text-decoration: none; color: #337ab7; }
+        .pagination strong { background-color: #337ab7; color: white; border-color: #337ab7; }
+        .detail-btn { 
+            display: inline-block; 
+            padding: 5px 10px; 
+            background-color: #0d47a1; 
+            color: white; 
+            text-decoration: none; 
+            border-radius: 4px; 
+            font-size: 0.9em;
+        }
+        .detail-btn:hover { background-color: #1565c0; }
+        .download-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 0.95em;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .button-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .button-container a + a {
+            margin-left: 10px;
+        }
+        .btn-csv {
+            background-color: #28a745;
+        }
+        .btn-csv:hover {
+            background-color: #218838;
+        }
+        .btn-pdf {
+            background-color: #ff7043;
+        }
+        .btn-pdf:hover {
+            background-color: #f4511e;
+        }
+        /* Bootstrap Badge 스타일 */
+        .badge {
+            display: inline-block;
+            padding: .25em .4em;
+            font-size: 75%;
+            font-weight: 700;
+            line-height: 1;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: baseline;
+            border-radius: .25rem;
+        }
+        .badge-info { color: #fff; background-color: #17a2b8; }
+        .badge-warning { color: #212529; background-color: #ffc107; }
+        .badge-success { color: #fff; background-color: #28a745; }
+        .badge-secondary { color: #fff; background-color: #6c757d; }
+    </style>
+</head>
+<div layout:fragment="content">
+    <div class="container">
+        <div class="search-container">
+            <form th:action="@{/report/history}" method="get">
+                <input type="text" id="searchInput" name="keyword" placeholder="신고인, 차량 모델, VIN으로 검색..." th:value="${pageMaker.cri.keyword}">
+                <button type="submit">검색</button>
+            </form>
+        </div>
+        
+        <div class="button-container">
+            <a th:href="@{/report/download/csv}" class="download-btn btn-csv">📥 리콜 신청 내역 CSV 다운로드</a>
+            <a th:href="@{/report/download/pdf}" class="download-btn btn-pdf">📄 리콜 신청 내역 PDF 다운로드</a>
+        </div>
+
+        <table id="reportTable">
+            <thead>
+                <tr>
+                    <th class="col-small col-id">신고번호</th>
+                    <th class="col-small">신고인</th>
+                    <th class="col-medium">차량 모델</th>
+                    <th>결함 내용</th>
+                    <th class="col-medium">신고일</th>
+                    <th class="col-small">상태</th>
+                    <th class="col-action"></th> <!-- 상세보기 버튼을 위한 컬럼 -->
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:if="${reportList.isEmpty()}">
+                    <td colspan="7" style="text-align: center; padding: 20px;">검색 결과가 없습니다.</td>
+                </tr>
+                <tr th:each="report : ${reportList}">
+                    <td class="col-id" th:text="${report.id}"></td>
+                    <td th:text="${report.reporterName}"></td>
+                    <td th:text="${report.carModel}"></td>
+                    <td th:text="${report.defectDetails}"></td>
+                    <td th:text="${#temporals.format(report.reportDate, 'yyyy-MM-dd HH:mm')}"></td>
+                    <td th:switch="${report.status}">
+                        <span th:case="'접수'" class="badge badge-info">접수</span>
+                        <span th:case="'처리중'" class="badge badge-warning">처리중</span>
+                        <span th:case="'완료'" class="badge badge-success">완료</span>
+                        <span th:case="*" class="badge badge-secondary" th:text="${report.status}"></span>
+                    </td>
+                    <td class="col-action"><a th:href="@{/report/detail(id=${report.id})}" class="detail-btn">상세보기</a></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Pagination -->
+        <div class="pagination">
+            <a th:if="${pageMaker.prev}" th:href="@{/report/history(pageNum=${pageMaker.startPage - 1}, keyword=${pageMaker.cri.keyword})}">&laquo;</a>
+
+            <th:block th:each="num : ${#numbers.sequence(pageMaker.startPage, pageMaker.endPage)}">
+                <strong th:if="${pageMaker.cri.pageNum == num}" th:text="${num}"></strong>
+                <a th:unless="${pageMaker.cri.pageNum == num}" th:href="@{/report/history(pageNum=${num}, keyword=${pageMaker.cri.keyword})}" th:text="${num}"></a>
+            </th:block>
+
+            <a th:if="${pageMaker.next}" th:href="@{/report/history(pageNum=${pageMaker.endPage + 1}, keyword=${pageMaker.cri.keyword})}">&raquo;</a>
+        </div>
+    </div>
+</div>
+</html>

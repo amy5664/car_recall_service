@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default_layout}">
+<head>
+    <title>온라인 상담 신청</title>
+	<th:block layout:fragment="css">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #fff;
+            color: #333;
+        }
+        .container {
+            width: 800px;
+            margin: 50px auto;
+            border: 1px solid #ddd;
+            padding: 30px 40px;
+            border-radius: 6px;
+        }
+        h2 {
+            border-bottom: 2px solid #003366;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+            font-size: 22px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        td {
+            padding: 10px;
+            vertical-align: middle;
+        }
+        .label {
+            width: 150px;
+            font-weight: bold;
+            color: #333;
+        }
+        input[type="text"],
+        input[type="password"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        textarea {
+            height: 150px;
+        }
+        .btn {
+            padding: 8px 14px;
+            background-color: #003366;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background-color: #0055a5;
+        }
+        .radio-group input {
+            margin-right: 5px;
+        }
+        .submit-box {
+            text-align: center;
+            margin-top: 30px;
+        }
+        .required {
+            color: red;
+        }
+        .image-preview-container { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+        .image-preview { width: 100px; height: 100px; border: 1px solid #ddd; display: flex; justify-content: center; align-items: center; overflow: hidden; position: relative; }
+        .image-preview img { max-width: 100%; max-height: 100%; object-fit: cover; }
+    </style>
+	</th:block>
+</head>
+
+<div layout:fragment="content">
+
+    <div class="container">
+        <h2>온라인 상담 신청</h2>
+        <form th:action="@{/complain_write}" method="post" class="cmpl_frm" enctype="multipart/form-data">
+            <table class="cmpl_tab">
+                <tr>
+                    <td class="label">신청인 <span class="required">※</span></td>
+                    <td>
+                        <th:block th:if="${loggedInUserName != null}">
+                            <input type="hidden" id="reporter_name" name="reporter_name" th:value="${loggedInUserName}">
+                            <span th:text="${loggedInUserName}" class="form-control" style="background-color: #e9ecef; cursor: not-allowed;"></span>
+                        </th:block>
+                        <th:block th:unless="${loggedInUserName != null}">
+                            <input type="text" id="reporter_name" name="reporter_name" placeholder="이름을 입력하세요" required>
+                        </th:block>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="label">비밀번호 <span class="required">※</span></td>
+                    <td><input type="password" id="password" name="password" placeholder="4글자 이상의 비밀번호를 입력" required></td>
+                </tr>
+                <tr>
+                    <td class="label">휴대폰번호 <span class="required">※</span></td>
+                    <td>
+						<input type="text" id="phone" name="phone"  placeholder="- 없이 입력하세요" required>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="label">제목 <span class="required">※</span></td>
+                    <td><input type="text" id="title" name="title" placeholder="제목을 입력하세요" required></td>
+                </tr>
+                <tr>
+                    <td class="label">상담구분</td>
+                    <td class="radio-group">
+                        <label><input type="radio" name="complain_type" value="1" checked> 제작결함</label>
+                        <label><input type="radio" name="complain_type" value="2"> 기타</label>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="label">자동차 등록번호</td>
+                    <td><input type="text" name="carNum" placeholder="예: 서울00나0000, 00다0000"></td>
+                </tr>
+                <tr>
+                    <td class="label">공개여부</td>
+                    <td class="radio-group">
+                        <label><input type="radio" name="is_public" value="Y" checked> 공개</label>
+                        <label><input type="radio" name="is_public" value="N"> 비공개</label>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="label">내용 <span class="required">※</span></td>
+                    <td><textarea id="content" name="content" placeholder="상담 내용을 입력해주세요." required></textarea></td>
+                </tr>
+                <tr>
+                    <td class="label">파일 첨부</td>
+                    <td>
+                        <input type="file" id="complainImages" name="uploadFiles" accept="image/*" multiple onchange="previewImages(event)">
+                        <div class="image-preview-container" id="imagePreviewContainer"></div>
+                    </td>
+                </tr>
+            </table>
+
+            <div class="submit-box">
+                <button type="button" class="btn" onclick="check_ok()">등록</button>
+                <button type="button" class="btn" onclick="history.back()">이전</button>
+            </div>
+        </form>
+    </div>
+
+</div>
+
+<th:block layout:fragment="script">
+	<script th:src="@{/js/complain.js}"></script>
+    <script>
+        function previewImages(event) {
+            const previewContainer = document.getElementById('imagePreviewContainer');
+            previewContainer.innerHTML = ''; // 기존 미리보기 초기화
+
+            if (event.target.files) {
+                Array.from(event.target.files).forEach(file => {
+                    if (file.type.startsWith('image/')) { // 이미지 파일만 미리보기
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            const imgDiv = document.createElement('div');
+                            imgDiv.className = 'image-preview';
+                            const img = document.createElement('img');
+                            img.src = e.target.result;
+                            imgDiv.appendChild(img);
+                            previewContainer.appendChild(imgDiv);
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            }
+        }
+    </script>
+</th:block>
+</html>

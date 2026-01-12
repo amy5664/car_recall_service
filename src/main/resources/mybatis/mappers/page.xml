@@ -1,0 +1,42 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.boot.dao.PageDAO">
+
+    <sql id="criteria">
+        <if test="keyword != null and keyword != '' and type != null and type != ''">
+            <choose>
+                <when test='type == "T"'>
+                    AND BOARD_TITLE LIKE CONCAT('%', #{keyword}, '%')
+                </when>
+                <when test='type == "C"'>
+                    AND BOARD_CONTENT LIKE CONCAT('%', #{keyword}, '%')
+                </when>
+                <when test='type == "TC"'>
+                    AND (BOARD_TITLE LIKE CONCAT('%', #{keyword}, '%')
+                    OR BOARD_CONTENT LIKE CONCAT('%', #{keyword}, '%'))
+                </when>
+            </choose>
+        </if>
+    </sql>
+
+    <select id="listWithPaging" parameterType="com.boot.dto.Criteria" resultType="com.boot.dto.BoardDTO">
+        SELECT BOARD_NO    AS boardNo,
+               BOARD_NAME AS boardName,
+               BOARD_TITLE AS boardTitle,
+               BOARD_CONTENT AS boardContent,
+               BOARD_DATE AS boardDate,
+               HIT AS boardHit
+        FROM RECALL_BOARD
+        WHERE 1 = 1
+        <include refid="criteria" />
+        ORDER BY BOARD_NO DESC
+        LIMIT #{amount} OFFSET ${(pageNum - 1) * amount}
+    </select>
+
+    <select id="getTotalCount" parameterType="com.boot.dto.Criteria" resultType="int">
+        SELECT COUNT(*) FROM RECALL_BOARD WHERE 1=1
+        <include refid="criteria"/>
+    </select>
+</mapper>

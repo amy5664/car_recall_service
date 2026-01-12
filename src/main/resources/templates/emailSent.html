@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default_layout}">
+<head>
+    <title>이메일 발송 완료</title>
+    <th:block layout:fragment="css">
+        <link rel="stylesheet" th:href="@{/css/login.css}" />
+    </th:block>
+</head>
+<div layout:fragment="content">
+    <main class="login-container">
+        <div class="login-card">
+            <h1 class="login-title">이메일 발송 완료</h1>
+            <p class="result-message">
+                <th:block th:if="${message != null}" th:utext="${message}"></th:block>
+                <th:block th:unless="${message != null}">
+                        회원가입을 위한 인증 이메일이 발송되었습니다.<br>
+                        이메일을 확인하고 인증 링크를 클릭하여 회원가입을 완료해주세요.
+                </th:block>
+            </p>
+            <a th:href="@{/login}" class="login-btn" style="text-decoration: none; display: block; margin-top: 1.5rem;">로그인 페이지로 이동</a>
+        </div>
+    </main>
+</div>
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default_layout}">
+<head>
+    <title>유사 리콜 사례</title>
+    <th:block layout:fragment="css">
+        <style>
+        /* 이 페이지에만 적용될 추가적인 스타일 */
+        .container {
+            padding-top: 50px;
+            padding-bottom: 50px;
+        }
+        .search-container {
+            padding: 20px;
+            background: #fff;
+            margin-top: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center; /* 폼 자체를 중앙 정렬하기 위함 */
+        }
+        .search-container form {
+            display: flex; /* flexbox를 사용하여 내부 요소 정렬 */
+            justify-content: center; /* 가로 중앙 정렬 */
+            align-items: center; /* 세로 중앙 정렬 */
+            max-width: 500px; /* 폼의 최대 너비 제한 */
+            margin: 0 auto; /* 폼 자체를 부모 요소 내에서 중앙 정렬 */
+        }
+        .search-container input[type="text"] {
+            flex-grow: 1; /* 남은 공간을 채우도록 설정 */
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-right: 10px; /* 입력 필드와 버튼 사이 간격 */
+            min-width: 150px; /* 최소 너비 지정 */
+        }
+        .search-container button {
+            padding: 10px 20px;
+            background: #0d47a1;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+            background: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            table-layout: fixed; /* 테이블 레이아웃 고정 */
+        }
+        th, td {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+            vertical-align: middle;
+            word-wrap: break-word; /* 긴 텍스트 자동 줄바꿈 */
+        }
+        th { background-color: #1e88e5; color: white; }
+        tr:hover { background-color: #f1f1f1; }
+        .error-message { color: red; text-align: center; padding: 20px; background-color: #ffebee; border: 1px solid #e57373; border-radius: 8px; margin-top: 20px; }
+        .pagination { text-align: center; margin-top: 20px; }
+        .pagination a, .pagination strong { display: inline-block; padding: 5px 10px; margin: 0 2px; border: 1px solid #ddd; background-color: #fff; text-decoration: none; color: #337ab7; }
+        .pagination strong { background-color: #337ab7; color: white; border-color: #337ab7; }
+
+        /* 컬럼 너비 설정 */
+        .col-maker { width: 12%; }
+        .col-model { width: 18%; }
+        .col-date { width: 12%; }
+
+        </style>
+    </th:block>
+</head>
+<div layout:fragment="content">
+    <div class="container">
+    <div th:if="${errorMessage != null}" class="error-message">
+        <div class="error-message">
+            <p th:text="${errorMessage}"></p>
+        </div>
+    </div>
+
+    <h2>유사 리콜 사례</h2>
+
+    <div th:if="${not #lists.isEmpty(similarRecalls)}">
+        <table id="recallTable">
+            <thead>
+            <tr>
+                <th class="col-maker">제조사</th>
+                <th class="col-model">차종</th>
+                <th class="col-date">리콜 날짜</th>
+                <th>리콜 사유</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="item : ${similarRecalls}">
+                <td th:text="${item.recall.maker}"></td>
+                <td th:text="${item.recall.modelName}"></td>
+                <td th:text="${item.recall.recallDate}"></td>
+                <td th:text="${item.recall.recallReason}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div th:if="${#lists.isEmpty(similarRecalls)}">
+        <p style="text-align:center; padding-top: 20px;">유사 리콜 사례가 없습니다.</p>
+    </div>
+    </div>
+</div>
+</html>

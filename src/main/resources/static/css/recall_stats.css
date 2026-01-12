@@ -1,0 +1,372 @@
+/* ===========================
+   페이지 전체 레이아웃
+   =========================== */
+.recall-stats-page {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 24px;
+    background: #fff;
+    box-sizing: border-box;
+}
+
+/* 제목 */
+.page-title {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin: 0 0 16px;
+}
+
+/* ===========================
+   필터 카드
+   =========================== */
+.filter-area {
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 20px 20px 16px;
+    background: #f8fafc;
+    box-shadow: 0 2px 4px rgba(15, 23, 42, 0.05);
+}
+
+/* 집계 기준 탭 */
+.groupby-tabs {
+    display: inline-flex;
+    border-radius: 999px;
+    background: #e5e7eb;
+    padding: 3px;
+    margin-bottom: 16px;
+}
+
+.groupby-tabs .tab-btn {
+    border: none;
+    background: transparent;
+    padding: 6px 16px;
+    font-size: 0.9rem;
+    border-radius: 999px;
+    cursor: pointer;
+}
+
+.groupby-tabs .tab-btn.is-active {
+    background: #1d4ed8;
+    color: #fff;
+}
+
+/* 필터 그리드 */
+.filter-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px 24px;
+    margin-bottom: 12px;
+}
+
+.filter-item label {
+    display: block;
+    font-size: 0.85rem;
+    margin-bottom: 4px;
+    color: #374151;
+}
+
+.filter-item input,
+.filter-item select {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    box-sizing: border-box;
+}
+
+.filter-inline {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.filter-inline input {
+    flex: 1;
+}
+
+.tilde {
+    font-size: 0.9rem;
+    color: #6b7280;
+}
+
+/* 버튼 영역 */
+.filter-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 8px;
+}
+
+.btn-primary,
+.btn-outline {
+    padding: 8px 16px;
+    border-radius: 999px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    border: none;
+}
+
+.btn-primary {
+    background: #1d4ed8;
+    color: #fff;
+}
+
+.btn-outline {
+    border: 1px solid #cbd5e1;
+    background: #fff;
+    color: #374151;
+}
+
+/* ===========================
+   결과 탭
+   =========================== */
+.result-tabs {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;          /* 필터와 살짝만 띄우기 */
+    margin-bottom: 4px;        /* 선이랑 표를 좀 더 붙이기 */
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.result-tab {
+    border: none;
+    background: transparent;
+    padding: 8px 16px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: #4b5563;
+}
+
+.result-tab.is-active {
+    border-bottom: 2px solid #1d4ed8;
+    color: #1d4ed8;
+    font-weight: 600;
+}
+
+/* ===========================
+   결과 영역
+   =========================== */
+.result-area {
+    margin-top: 8px;   /* 탭 아래 여백 최소화 */
+}
+
+.result-view {
+    display: none;
+}
+
+.result-view.is-active {
+    display: block;
+}
+
+/* 결과 요약 텍스트 */
+.result-summary {
+    font-size: 0.85rem;
+    color: #6b7280;
+    margin-bottom: 6px;
+}
+
+/* ===========================
+   표 스타일
+   =========================== */
+.stats-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;   /* 칸 폭 고정 */
+    margin-top: 6px;
+    font-size: 0.9rem;
+}
+
+.stats-table thead {
+    background: #eff6ff;
+}
+
+.stats-table th,
+.stats-table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid #e5e7eb;
+    text-align: left;
+    vertical-align: top;
+    font-size: 14px;
+}
+
+/* 제조사 칸: 짧으니까 한 줄 고정 */
+.stats-table th:nth-child(1),
+.stats-table td:nth-child(1) {
+    width: 18%;
+    white-space: nowrap;
+}
+
+/* 모델명 칸: 길어서 말줄임표 처리 */
+.stats-table th:nth-child(2),
+.stats-table td.col-model {
+    width: 52%;
+}
+
+.stats-table td.col-model {
+    max-width: 480px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* 기간 / 리콜 건수 */
+.stats-table th:nth-child(3),
+.stats-table td:nth-child(3),
+.stats-table th:nth-child(4),
+.stats-table td:nth-child(4) {
+    width: 15%;
+    white-space: nowrap;
+    text-align: center;
+}
+
+/* 행 hover */
+.stats-table tbody tr:hover {
+    background: #f9fafb;
+}
+
+/* 표 하단 버튼 */
+.table-footer {
+    margin-top: 8px;
+    text-align: right;
+}
+
+/* ===========================
+   차트
+   =========================== */
+#statsChart {
+    width: 100%;
+    max-height: 380px;
+}
+
+/* ===========================
+   오른쪽 슬라이드 상세 패널
+   =========================== */
+.stats-detail-panel {
+    position: fixed;
+    top: 80px;              /* 헤더 높이에 맞게 조절 */
+    right: -420px;          /* 기본은 화면 밖 */
+    width: 400px;
+    height: calc(100% - 100px);
+    background: #fff;
+    border-left: 1px solid #e5e7eb;
+    box-shadow: -4px 0 16px rgba(0,0,0,.08);
+    padding: 20px 24px;
+    box-sizing: border-box;
+    transition: right .25s ease;
+    z-index: 2000;
+    display: flex;
+    flex-direction: column;
+}
+
+.stats-detail-panel.is-open {
+    right: 0;               /* 열릴 때 화면 안으로 */
+}
+
+.detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.detail-header h3 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.detail-close {
+    border: none;
+    background: transparent;
+    font-size: 24px;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.detail-body {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow-y: auto;
+    font-size: 14px;
+}
+
+.detail-row {
+    display: flex;
+    gap: 8px;
+}
+
+.detail-row .label {
+    flex: 0 0 70px;
+    font-weight: 600;
+    color: #4b5563;
+}
+
+.detail-row .value {
+    flex: 1;
+    color: #111827;
+    white-space: pre-wrap;   /* 긴 모델명 줄바꿈 */
+}
+
+/* 탭 아래 모든 여백 강제 제거 */
+.result-tabs,
+.result-tabs * {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+/* result-area 위쪽 여백 강제 제거 */
+.result-area {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+}
+
+/* tableView 자체 여백 제거 */
+#tableView {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+}
+
+/* 표 위쪽 간격 강제 제거 */
+.stats-table {
+    margin-top: 0 !important;
+}
+
+/* 혹시 wrapper div 있는 경우 대비 */
+.result-view {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+}
+
+/* 탭 아래 살짝(12px) 간격 */
+.result-tabs {
+    margin-bottom: 12px !important;
+    padding-bottom: 4px !important;  /* 너무 딱 붙지 않게 */
+}
+
+/* 통계 리스트 영역 전체 여백 정리 */
+.result-area {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+}
+
+/* 표가 탭과 너무 붙지 않게 10px 여백 */
+#tableView {
+    margin-top: 25px !important;
+}
+
+/* 표 위에 summary가 있을 때도 간격 최소화 */
+#resultSummary {
+    margin: 4px 0 6px 0 !important;
+    padding: 0 !important;
+}
+
+/* 표 자체 상단 여백 */
+.stats-table {
+    margin-top: 6px !important;
+}
+
+/* table footer도 적당한 간격 */
+.table-footer {
+    margin-top: 12px !important;
+}

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default_layout}">
+<head>
+    <title>내 차량 관리</title>
+    <th:block layout:fragment="css">
+        <link rel="stylesheet" th:href="@{/css/login.css}" /> <!-- 재활용 가능한 스타일 -->
+        <style>
+        /* 기존 my-vehicles-container 스타일을 제거하거나 조정 */
+        /* .my-vehicles-container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 30px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        } */
+        .my-vehicles-container h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .vehicle-form {
+            margin-bottom: 40px;
+            padding: 20px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+        .vehicle-form h2 {
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            color: #007bff;
+            text-align: center;
+        }
+        .vehicle-list {
+            list-style: none;
+            padding: 0;
+        }
+        .vehicle-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        .vehicle-info {
+            flex-grow: 1;
+        }
+        .vehicle-info strong {
+            font-size: 1.1rem;
+            color: #333;
+        }
+        .vehicle-info span {
+            display: block;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        .delete-btn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .delete-btn:hover {
+            background-color: #c82333;
+        }
+        .no-vehicles {
+            text-align: center;
+            color: #888;
+            padding: 30px;
+            border: 1px dashed #ccc;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        /* .container 클래스에 맞게 여백 조정 */
+        main.container {
+            padding-top: 50px;
+            padding-bottom: 50px;
+        }
+        </style>
+    </th:block>
+</head>
+<div layout:fragment="content">
+    <main class="container">
+        <div class="my-vehicles-container">
+            <h1>내 차량 관리</h1>
+
+            <p th:if="${message}" class="alert alert-success" th:text="${message}"></p>
+            <p th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></p>
+
+            <div class="vehicle-form">
+                <h2>새 차량 등록</h2>
+                <form th:action="@{/my-vehicles/add}" method="post">
+                    <div class="input-group">
+                        <label for="maker">제조사</label>
+                        <input type="text" id="maker" name="maker" required />
+                    </div>
+                    <div class="input-group">
+                        <label for="carModel">모델명</label>
+                        <input type="text" id="carModel" name="carModel" required />
+                    </div>
+                    <button type="submit" class="login-btn">차량 등록</button>
+                </form>
+            </div>
+
+            <h2>등록된 내 차량</h2>
+            <div th:if="${not #lists.isEmpty(userVehicles)}">
+                <ul class="vehicle-list">
+                    <li th:each="vehicle : ${userVehicles}" class="vehicle-item">
+                        <div class="vehicle-info">
+                            <strong th:text="|${vehicle.maker} ${vehicle.carModel}|"></strong>
+                            <span th:text="|ID: ${vehicle.id}|"></span>
+                        </div>
+                        <form th:action="@{/my-vehicles/delete}" method="post" onsubmit="return confirm('정말로 이 차량을 삭제하시겠습니까?');">
+                            <input type="hidden" name="id" th:value="${vehicle.id}" />
+                            <button type="submit" class="delete-btn">삭제</button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+            <div th:if="${#lists.isEmpty(userVehicles)}">
+                <p class="no-vehicles">등록된 차량이 없습니다. 새로운 차량을 등록하여 리콜 알림을 받아보세요!</p>
+            </div>
+        </div>
+    </main>
+</div>
+<th:block layout:fragment="script">
+     <script th:inline="javascript">
+        // 페이지 로드 시 메시지 팝업
+        window.onload = function() {
+            const message = /*[[${message}]]*/ null;
+            const errorMessage = /*[[${errorMessage}]]*/ null;
+            if (message) {
+                alert(message);
+            }
+            if (errorMessage) {
+                alert("오류: " + errorMessage);
+            }
+        };
+    </script>
+</th:block>
+</html>

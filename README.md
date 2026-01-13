@@ -58,8 +58,9 @@
 > - ⭐⭐   : 주요 기능 구현  
 > - ⭐     : 일부 기능 구현  
 
-📄 **개인 기여 상세 문서 (PDF)**  
-(추후 PDF 업로드 후 링크 추가 예정)
+📄 <a href="pdf/car_recall_service_gayoung.pdf" target="_blank">
+<strong>개인 기여 상세 문서 (PDF)</strong>
+</a>
 
 ---
 
